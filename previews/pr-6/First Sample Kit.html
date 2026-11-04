@@ -1,0 +1,368 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style>.bi-toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:12px 24px;background:#e7edf4;color:#172c43;font:13px/1.6 system-ui;border-bottom:1px solid #ccd5df}.bi-toolbar a{color:#234b72}.bi-toolbar small{margin-left:auto}</style></head><body><aside class="bi-toolbar"><a href="https://greendynamics.github.io/byteinfra-site/">ByteInfra</a><span>版本 a379c2a</span><a href="https://github.com/GreenDynamics/byteinfra/issues?q=is%3Aissue%20%22https%3A//greendynamics.github.io/byteinfra-site/First%2520Sample%2520Kit.html%22">相关讨论</a><a href="https://github.com/GreenDynamics/byteinfra/issues/new?template=architecture.yml&amp;title=%5B%E6%9E%B6%E6%9E%84%E8%AE%A8%E8%AE%BA%5D+First+Sample+Kit&amp;page=https%3A%2F%2Fgreendynamics.github.io%2Fbyteinfra-site%2FFirst%2520Sample%2520Kit.html&amp;version=a379c2a737cba0e961fd4d3ad07b88021179ee9c">提出修改</a><a href="https://github.com/GreenDynamics/byteinfra/blob/a379c2a737cba0e961fd4d3ad07b88021179ee9c/docs/reference/data-env/First%20Sample%20Kit.html">查看来源</a><small>讨论与修改需团队仓库权限</small></aside>
+<title>First Sample Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: internal briefing sheet matching the 07 Data & Environment doc — header rule, two figure panels, checklists */
+:root{--bg:#f6f5f1;--panel:#fff;--ink:#1c1c1a;--muted:#6b6a65;--line:#d9d6cd;--accent:#1f3864;--accent-ink:#fff;
+--corpus:#ececec;--comp:#dbe5f3;--phys:#dcefd6;--xc:#fbefc6;--keep:#f9dfd2;--ops:#e6e0f2;
+--comp-ink:#1f3864;--phys-ink:#2b5a25;--xc-ink:#6f5200;--keep-ink:#8a3b12;--ops-ink:#4a3a78;--real:#2f7a3a;
+--font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"PingFang SC","Noto Sans SC",sans-serif;
+--font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#383b45;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--xc:#3a3114;--keep:#3d2416;--ops:#2a2340;
+--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--xc-ink:#f0d777;--keep-ink:#f1b48f;--ops-ink:#cdbcf5;--real:#7fd38a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#383b45;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--xc:#3a3114;--keep:#3d2416;--ops:#2a2340;
+--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--xc-ink:#f0d777;--keep-ink:#f1b48f;--ops-ink:#cdbcf5;--real:#7fd38a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body)}
+.wrap{max-width:1140px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{font-size:28px;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 small{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-top:4px}
+.badge{font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--keep);color:var(--keep-ink);padding:4px 10px;border-radius:4px;font-weight:700}
+.lead{font-size:16px;max-width:860px;margin:0 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin:10px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--line)}
+.ld{width:10px;height:10px;border-radius:50%;background:var(--real)}.ld.o{background:none;border:1.5px solid var(--muted)}
+h2{font-size:20px;margin:40px 0 4px;padding-top:12px;border-top:1px solid var(--line);text-wrap:balance}
+h2+p{margin:0 0 10px;color:var(--muted);font-size:14px;max-width:820px}
+figure{margin:12px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 14px 10px;overflow-x:auto}
+figure svg{width:100%;min-width:860px;height:auto;display:block;color:var(--ink)}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+.band{stroke:none}.band.c{fill:var(--comp)}.band.p{fill:var(--phys)}.band.x{fill:var(--xc)}.band.m{fill:var(--ops)}
+.bl{font-size:11px;font-weight:700;letter-spacing:.06em}.lc{fill:var(--comp-ink)}.lp{fill:var(--phys-ink)}.lx{fill:var(--xc-ink)}.lm{fill:var(--ops-ink)}.lz{fill:var(--muted)}
+.tm{fill:var(--muted);font-size:11.5px;letter-spacing:.02em}
+.band.z{fill:var(--corpus)}
+.bx-l{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+.tt-l{fill:var(--muted);font-size:12px;font-weight:700}.ts-l{fill:var(--muted);font-size:11px}
+.cut{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:2 4}
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:14px 0 0}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.stage.on{border:2px solid var(--accent)}
+.stage b{display:block;font-size:14px}.stage .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stage p{margin:4px 0 0;font-size:13.5px}
+.must{border-left:4px solid var(--keep-ink);background:var(--panel);padding:12px 16px;border-radius:6px;margin:18px 0 0}
+.must h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--keep-ink)}
+.must ol{margin:0;padding-left:20px}.must li{font-size:14px;margin:3px 0}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:10px 0}
+table{border-collapse:collapse;width:100%;min-width:680px}
+th{background:var(--accent);color:var(--accent-ink);text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:9px 10px}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top;font-size:13.5px}
+td:first-child{font-weight:600;white-space:nowrap}td.own{color:var(--muted);width:110px}
+.bx{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+.bx-k{fill:var(--keep);stroke:var(--keep-ink);stroke-width:1.2}
+.bx-q{fill:var(--panel);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:5 4}
+.pk{fill:none;stroke:currentColor;stroke-width:1.4;stroke-dasharray:6 5}
+.hd{fill:currentColor;font-size:14px;font-weight:700;letter-spacing:.04em}
+.tt{fill:currentColor;font-size:12.5px;font-weight:700}
+.ts{fill:currentColor;font-size:11.5px}
+.dot{fill:var(--real)}.dot-o{fill:none;stroke:var(--muted);stroke-width:1.5}
+.nda{fill:var(--keep-ink)}.ntx{fill:var(--panel);font-size:9.5px;font-weight:700;letter-spacing:.06em}
+.ln{stroke:currentColor;stroke-width:1.3;fill:none}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 8px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+pre{margin:0;font:12.5px/1.55 var(--font-mono);overflow-x:auto;color:var(--ink)}
+pre .c{color:var(--muted)}
+ul{margin:0;padding-left:18px}li{font-size:14px;margin:3px 0}
+footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:640px){h1{font-size:22px}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>First Sample Kit
+    <small>The minimum we send a frontier lab to earn a scoped deal · v2 · 2 Nov 2026</small></h1>
+  <span class="badge">Internal</span>
+</header>
+
+<p class="lead">Build one data sample and one environment sample to this standard and nothing more. Everything else waits until a buyer scopes a paid delivery and we agree acceptance criteria with them.</p>
+
+<div class="stages">
+  <div class="stage"><span class="k">Stage 0 · first call</span><b>Menu + one filled card</b><p>08 menu, one Environment Card or Data Sheet with real numbers, 2–3 baseline figures.</p></div>
+  <div class="stage on"><span class="k">Stage 1 · first sample · this page</span><b>One family, one tier</b><p>Echo-S1 colour-mixing environment (20–50 target RGBs) and the PP-01 interpretation set (~100 items).</p></div>
+  <div class="stage"><span class="k">Stage 2 · paid delivery</span><b>Full pack</b><p>Everything in the grey "later" rows, against acceptance criteria agreed in writing.</p></div>
+</div>
+
+<div class="must"><h3>Four things that end the deal if missing</h3><ol>
+  <li><b>It runs</b> on their cluster with one command. A broken sample ends the conversation.</li>
+  <li><b>Baselines show headroom.</b> Frontier models at 0% or 95% means nothing to learn.</li>
+  <li><b>The reward cannot be trivially gamed.</b> Their RL team tries this first.</li>
+  <li><b>Rights are clean.</b> Legal stops the deal even if the tech passes.</li></ol></div>
+
+<h2>1. Data sample</h2>
+<p>Target: PP-01 interpretation set, about 100 double-reviewed items across colour mixing, titration and absorbance.</p>
+<figure>
+<svg viewBox="0 0 1100 582" role="img" aria-label="Stage 1 data sample: core items, raw evidence, answers and schema; proof by double review and baselines; a short data sheet and rights statement. Training uplift, leakage report, holdout spec, licence and public slice come later.">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect class="pk" x="220" y="16" width="680" height="382" rx="14"/>
+<text class="hd" x="234" y="38">DATA SAMPLE</text><text class="tm" x="360" y="38">Stage 1 minimum · one task family</text>
+<rect class="band c" x="230" y="50" width="660" height="108" rx="8"/>
+<text class="bl lc" x="242" y="68">CORE</text>
+<rect class="bx" x="240.0" y="78" width="152.5" height="72" rx="6"/>
+<text class="tt" x="249.0" y="96">Items</text>
+<text class="ts" x="249.0" y="113">50–150 items,</text>
+<text class="ts" x="249.0" y="127">one per JSONL line</text>
+<rect class="bx" x="402.5" y="78" width="152.5" height="72" rx="6"/>
+<text class="tt" x="411.5" y="96">Raw evidence</text>
+<text class="ts" x="411.5" y="113">spectra, images,</text>
+<text class="ts" x="411.5" y="127">instrument files</text>
+<rect class="bx" x="565.0" y="78" width="152.5" height="72" rx="6"/>
+<text class="tt" x="574.0" y="96">Answer / rubric</text>
+<text class="ts" x="574.0" y="113">reference answer or</text>
+<text class="ts" x="574.0" y="127">weighted criteria</text>
+<rect class="bx" x="727.5" y="78" width="152.5" height="72" rx="6"/>
+<text class="tt" x="736.5" y="96">Schema</text>
+<text class="ts" x="736.5" y="113">typed fields, units,</text>
+<text class="ts" x="736.5" y="127">all fields valid</text>
+<rect class="band p" x="230" y="168" width="660" height="108" rx="8"/>
+<text class="bl lp" x="242" y="186">PROOF</text>
+<rect class="bx" x="240.0" y="196" width="315.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="214">Double review</text>
+<text class="ts" x="249.0" y="231">2 reviewers + adjudication;</text>
+<text class="ts" x="249.0" y="245">report the agreement</text>
+<rect class="bx" x="565.0" y="196" width="315.0" height="72" rx="6"/>
+<text class="tt" x="574.0" y="214">Frontier baselines</text>
+<text class="ts" x="574.0" y="231">3 models, pass rate;</text>
+<text class="ts" x="574.0" y="245">shows headroom</text>
+<rect class="band x" x="230" y="286" width="660" height="108" rx="8"/>
+<text class="bl lx" x="242" y="304">PAPERWORK</text>
+<rect class="bx" x="240.0" y="314" width="315.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="332">Short Data Sheet</text>
+<text class="ts" x="249.0" y="349">what, how made, by whom,</text>
+<text class="ts" x="249.0" y="363">known issues: one page</text>
+<rect class="bx" x="565.0" y="314" width="315.0" height="72" rx="6"/>
+<text class="tt" x="574.0" y="332">Rights statement</text>
+<text class="ts" x="574.0" y="349">own production; experts</text>
+<text class="ts" x="574.0" y="363">consented to AI use</text>
+<line class="cut" x1="220" y1="420" x2="900" y2="420"/>
+<text class="tm" x="560.0" y="414" text-anchor="middle">STAGE 1 STOPS HERE · build the row below only after a buyer scopes a deal</text>
+<rect class="band z" x="230" y="434" width="660" height="108" rx="8"/>
+<text class="bl lz" x="242" y="452">LATER · Stage 2, paid delivery</text>
+<rect class="bx-l" x="240.0" y="462" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="249.0" y="480">Training uplift</text>
+<text class="ts-l" x="249.0" y="497">before / after run</text>
+<rect class="bx-l" x="370.0" y="462" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="379.0" y="480">Full leakage report</text>
+<text class="ts-l" x="379.0" y="497">search log</text>
+<rect class="bx-l" x="500.0" y="462" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="509.0" y="480">Holdout spec</text>
+<text class="ts-l" x="509.0" y="497">size, kept by GD</text>
+<rect class="bx-l" x="630.0" y="462" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="639.0" y="480">Licence + canary</text>
+<text class="ts-l" x="639.0" y="497">formal terms</text>
+<rect class="bx-l" x="760.0" y="462" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="769.0" y="480">Public HF slice</text>
+<text class="ts-l" x="769.0" y="497">gated, eval only</text>
+<text class="tm" x="105" y="58" text-anchor="middle">INPUTS</text>
+<rect class="bx" x="20" y="74" width="170" height="80" rx="8"/>
+<text class="tt" x="32" y="96">Expert network</text>
+<text class="ts" x="32" y="115">writes items, rubrics;</text>
+<text class="ts" x="32" y="130">reviews in pairs</text>
+<line class="ln" x1="190" y1="114" x2="228" y2="110" marker-end="url(#ar)"/>
+<rect class="bx" x="20" y="194" width="170" height="80" rx="8"/>
+<text class="tt" x="32" y="216">Lab records</text>
+<text class="ts" x="32" y="235">raw evidence from</text>
+<text class="ts" x="32" y="250">S1, S2, S4 runs</text>
+<line class="ln" x1="190" y1="234" x2="228" y2="130" marker-end="url(#ar)"/>
+<text class="tm" x="1005" y="58" text-anchor="middle">SENT TO BUYER</text>
+<rect class="bx" x="920" y="74" width="170" height="124" rx="8"/>
+<text class="tt" x="932" y="96">Sample folder</text>
+<text class="ts" x="932" y="115">one task family,</text>
+<text class="ts" x="932" y="130">e.g. PP-01</text>
+<text class="ts" x="932" y="145">interpretation set</text>
+<text class="ts" x="932" y="160">(~100 items)</text>
+<line class="ln" x1="900" y1="130" x2="918" y2="130" marker-end="url(#ar)"/>
+<rect class="bx-q" x="920" y="220" width="170" height="100" rx="8"/>
+<text class="tt" x="932" y="242">Then: scope call</text>
+<text class="ts" x="932" y="261">agree acceptance</text>
+<text class="ts" x="932" y="276">criteria before</text>
+<text class="ts" x="932" y="291">Stage 2</text>
+</svg>
+<figcaption>Eight items to build. The grey row is Stage 2 and should not hold up the sample.</figcaption>
+</figure>
+<div class="tablewrap"><table>
+<tr><th>Item</th><th>Done when</th><th>Owner</th></tr>
+<tr><td>Items</td><td>50–150 records in one JSONL file; each has id, prompt, input file references and a difficulty tag</td><td class="own">—</td></tr>
+<tr><td>Raw evidence</td><td>every item links to its spectra, images or instrument files, with units</td><td class="own">—</td></tr>
+<tr><td>Answer / rubric</td><td>every item has a reference answer or weighted binary criteria</td><td class="own">—</td></tr>
+<tr><td>Schema</td><td>one schema file; a script validates every record without errors</td><td class="own">—</td></tr>
+<tr><td>Double review</td><td>two reviewers per item, disagreements adjudicated, agreement figure reported</td><td class="own">—</td></tr>
+<tr><td>Frontier baselines</td><td>3 frontier models scored on the full set; no model above roughly 60%</td><td class="own">—</td></tr>
+<tr><td>Short Data Sheet</td><td>one page: contents, counts, how made, who made it, known issues</td><td class="own">—</td></tr>
+<tr><td>Rights statement</td><td>confirms own production and signed contributor consent for AI-training use</td><td class="own">—</td></tr>
+</table></div>
+<div class="cols">
+  <div class="card"><h3>Folder we send</h3>
+<pre>pp01-interpretation-sample/
+├── items.jsonl
+├── raw/                <span class="c"># evidence files</span>
+├── schema.json
+├── baselines.json      <span class="c"># 3 models</span>
+├── review_agreement.md
+├── DATASHEET.md        <span class="c"># one page</span>
+└── RIGHTS.md           <span class="c"># one paragraph</span></pre></div>
+</div>
+
+<h2>2. Environment sample</h2>
+<p>Target: Echo-S1 colour mixing. Each task gives a target RGB; the agent proposes volumes of dyed stock solutions and gets back the RGB predicted by a model fitted to our real camera and spectrometer runs. 20–50 target colours. Every competent agent can reach the colour, so the score comes from the path: the final ΔE is a gate, then safety and efficiency decide the score. Many different paths score full marks.</p>
+<figure>
+<svg viewBox="0 0 1100 700" role="img" aria-label="Stage 1 environment sample: 20 to 50 Harbor task folders; baselines with headroom and an anti-hacking note; a one-command run; an environment card and rights statement. OpenEnv adapter, noise model, ops figures, hosted endpoint and licence come later.">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect class="pk" x="220" y="16" width="680" height="500" rx="14"/>
+<text class="hd" x="234" y="38">ENVIRONMENT SAMPLE</text><text class="tm" x="430" y="38">Stage 1 minimum · one family, one tier</text>
+<rect class="band c" x="230" y="50" width="660" height="108" rx="8"/>
+<text class="bl lc" x="242" y="68">CORE · 20–50 task folders, one per target RGB</text>
+<rect class="bx" x="240.0" y="78" width="120.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="96">instruction.md</text>
+<text class="ts" x="249.0" y="113">what the agent reads:</text>
+<text class="ts" x="249.0" y="127">target RGB, budget,</text>
+<text class="ts" x="249.0" y="141">rules</text>
+<rect class="bx" x="370.0" y="78" width="120.0" height="72" rx="6"/>
+<text class="tt" x="379.0" y="96">task.json</text>
+<text class="ts" x="379.0" y="113">config for the runner:</text>
+<text class="ts" x="379.0" y="127">timeouts, resources,</text>
+<text class="ts" x="379.0" y="141">network off</text>
+<rect class="bx" x="500.0" y="78" width="120.0" height="72" rx="6"/>
+<text class="tt" x="509.0" y="96">environment/</text>
+<text class="ts" x="509.0" y="113">FROM shared base:</text>
+<text class="ts" x="509.0" y="127">colour model +</text>
+<text class="ts" x="509.0" y="141">tools</text>
+<rect class="bx" x="630.0" y="78" width="120.0" height="72" rx="6"/>
+<text class="tt" x="639.0" y="96">verifier/</text>
+<text class="ts" x="639.0" y="113">rubric + scorer;</text>
+<text class="ts" x="639.0" y="127">scores the path:</text>
+<text class="ts" x="639.0" y="141">ΔE, safety, steps</text>
+<rect class="bx" x="760.0" y="78" width="120.0" height="72" rx="6"/>
+<text class="tt" x="769.0" y="96">witnesses/</text>
+<text class="ts" x="769.0" y="113">paths proven to</text>
+<text class="ts" x="769.0" y="127">score full; not</text>
+<text class="ts" x="769.0" y="141">the answer</text>
+<rect class="band p" x="230" y="168" width="660" height="108" rx="8"/>
+<text class="bl lp" x="242" y="186">PROOF</text>
+<rect class="bx" x="240.0" y="196" width="315.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="214">Baselines + headroom</text>
+<text class="ts" x="249.0" y="231">3 models, pass@k, reward</text>
+<text class="ts" x="249.0" y="245">distribution; best in 10–60%</text>
+<rect class="bx" x="565.0" y="196" width="315.0" height="72" rx="6"/>
+<text class="tt" x="574.0" y="214">Anti-hacking note</text>
+<text class="ts" x="574.0" y="231">probing, interpolation,</text>
+<text class="ts" x="574.0" y="245">blind guessing, doing</text>
+<text class="ts" x="574.0" y="259">nothing: all score low</text>
+<rect class="band m" x="230" y="286" width="660" height="108" rx="8"/>
+<text class="bl lm" x="242" y="304">OPS</text>
+<rect class="bx" x="240.0" y="314" width="640.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="332">Runs in one command</text>
+<text class="ts" x="249.0" y="349">no outbound network; run.sh</text>
+<text class="ts" x="249.0" y="363">also exports Harbor layout</text>
+<rect class="band x" x="230" y="404" width="660" height="108" rx="8"/>
+<text class="bl lx" x="242" y="422">PAPERWORK</text>
+<rect class="bx" x="240.0" y="432" width="315.0" height="72" rx="6"/>
+<text class="tt" x="249.0" y="450">Environment Card</text>
+<text class="ts" x="249.0" y="467">one page: goal, interface,</text>
+<text class="ts" x="249.0" y="481">scoring, valid range</text>
+<rect class="bx" x="565.0" y="432" width="315.0" height="72" rx="6"/>
+<text class="tt" x="574.0" y="450">Rights statement</text>
+<text class="ts" x="574.0" y="467">data behind the twin</text>
+<text class="ts" x="574.0" y="481">is ours to license</text>
+<line class="cut" x1="220" y1="538" x2="900" y2="538"/>
+<text class="tm" x="560.0" y="532" text-anchor="middle">STAGE 1 STOPS HERE · build the row below only after a buyer scopes a deal</text>
+<rect class="band z" x="230" y="552" width="660" height="108" rx="8"/>
+<text class="bl lz" x="242" y="570">LATER · Stage 2, paid delivery</text>
+<rect class="bx-l" x="240.0" y="580" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="249.0" y="598">OpenEnv adapter</text>
+<text class="ts-l" x="249.0" y="615">+ harness map</text>
+<rect class="bx-l" x="370.0" y="580" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="379.0" y="598">Noise + coverage</text>
+<text class="ts-l" x="379.0" y="615">full model</text>
+<rect class="bx-l" x="500.0" y="580" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="509.0" y="598">Ops figures</text>
+<text class="ts-l" x="509.0" y="615">latency, concurrency</text>
+<rect class="bx-l" x="630.0" y="580" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="639.0" y="598">Hosted endpoint</text>
+<text class="ts-l" x="639.0" y="615">Live tier</text>
+<rect class="bx-l" x="760.0" y="580" width="120.0" height="72" rx="6"/>
+<text class="tt-l" x="769.0" y="598">Licence, SLA</text>
+<text class="ts-l" x="769.0" y="615">safety spec</text>
+<text class="tm" x="105" y="58" text-anchor="middle">BUYER'S SIDE</text>
+<rect class="bx" x="20" y="74" width="170" height="84" rx="8"/>
+<text class="tt" x="32" y="96">Agent</text>
+<text class="ts" x="32" y="115">their model, run by</text>
+<text class="ts" x="32" y="130">their RL harness</text>
+<line class="ln" x1="190" y1="100" x2="228" y2="100" marker-end="url(#ar)"/><text class="tm" x="206" y="93" text-anchor="middle">action</text>
+<line class="ln" x1="228" y1="134" x2="190" y2="134" marker-end="url(#ar)"/><text class="tm" x="206" y="149" text-anchor="middle">obs, reward</text>
+<rect class="bx" x="20" y="310" width="170" height="84" rx="8"/>
+<text class="tt" x="32" y="332">RL / infra team</text>
+<text class="ts" x="32" y="351">runs it, tries to</text>
+<text class="ts" x="32" y="366">break the reward</text>
+<line class="ln" x1="190" y1="352" x2="228" y2="352" marker-end="url(#ar)"/>
+<text class="tm" x="1005" y="58" text-anchor="middle">SENT TO BUYER</text>
+<rect class="bx" x="920" y="74" width="170" height="124" rx="8"/>
+<text class="tt" x="932" y="96">Sample pack</text>
+<text class="ts" x="932" y="115">one family, one tier:</text>
+<text class="ts" x="932" y="130">Echo-S1 colour</text>
+<text class="ts" x="932" y="145">mixing to a</text>
+<text class="ts" x="932" y="160">target RGB</text>
+<line class="ln" x1="900" y1="130" x2="918" y2="130" marker-end="url(#ar)"/>
+<rect class="bx-q" x="920" y="220" width="170" height="100" rx="8"/>
+<text class="tt" x="932" y="242">Then: scope call</text>
+<text class="ts" x="932" y="261">agree acceptance</text>
+<text class="ts" x="932" y="276">criteria before</text>
+<text class="ts" x="932" y="291">Stage 2</text>
+</svg>
+<figcaption>Five parts per task, plus five pack-level items. The rubric in verifier/ is the only place the full-score conditions are written; witnesses/ only proves they can be met. The anti-hacking note matters most: it is what their RL team checks on the first run.</figcaption>
+</figure>
+<div class="tablewrap"><table>
+<tr><th>Item</th><th>Done when</th><th>Owner</th></tr>
+<tr><td>Task folders</td><td>20–50 folders, each with instruction.md, task.json, environment/, verifier/, witnesses/</td><td class="own">—</td></tr>
+<tr><td>task.json</td><td>one template shared by all tasks: id, family, tier, version, difficulty, agent and verifier timeouts, CPU and memory, allow_internet false</td><td class="own">—</td></tr>
+<tr><td>Shared base image</td><td>one image holds the colour model, propose_recipe and query_history; each task Dockerfile is a one-line FROM</td><td class="own">—</td></tr>
+<tr><td>Rubric</td><td>one rubric.json: ΔE ≤ 3 as the gate, then weighted safety, attempts and material use; scorer reads every step, never compares recipes to a witness</td><td class="own">—</td></tr>
+<tr><td>Witness check</td><td>2–3 witnesses per task taking clearly different paths all score full under the current rubric; check.json regenerates on every rubric change</td><td class="own">—</td></tr>
+<tr><td>Baselines + headroom</td><td>3 models, several runs each; pass@k within the attempt budget and ΔE distribution; share of runs reaching full score roughly 10–60% (tighten the rubric if higher), and compared with random search and Bayesian optimisation at the same budget</td><td class="own">—</td></tr>
+<tr><td>Anti-hacking note</td><td>tried: probing the twin, interpolating from query history, out-of-range or negative volumes, blind guessing on the first attempt, doing nothing to avoid violations, format tricks; each scored low</td><td class="own">—</td></tr>
+<tr><td>One-command run</td><td>a colleague outside the team runs it on a clean machine with network off; run.sh also exports the Harbor layout; rough GPU-hours recorded</td><td class="own">—</td></tr>
+<tr><td>Environment Card</td><td>one page: goal, tools (propose_recipe, query_history), ΔE scoring, colour range the twin covers, held-out error against real runs</td><td class="own">—</td></tr>
+<tr><td>Rights statement</td><td>confirms the S1 runs behind the twin are ours to license</td><td class="own">—</td></tr>
+</table></div>
+<div class="cols">
+  <div class="card"><h3>Folder we send</h3>
+<pre>echo-s1-sample/
+├── tasks/
+│   └── task-0007/
+│       ├── instruction.md     <span class="c"># target RGB, budget, rules</span>
+│       ├── task.json          <span class="c"># timeouts, resources, network off</span>
+│       ├── environment/
+│       │   └── Dockerfile     <span class="c"># FROM echo-s1-base</span>
+│       ├── verifier/
+│       │   ├── rubric.json    <span class="c"># the only scoring standard</span>
+│       │   ├── score.py       <span class="c"># reads every step</span>
+│       │   └── test.sh        <span class="c"># writes the reward</span>
+│       └── witnesses/
+│           ├── expert_01.jsonl
+│           ├── expert_02.jsonl
+│           ├── bo_01.jsonl
+│           └── check.json     <span class="c"># auto: scores under rubric</span>
+├── run.sh                     <span class="c"># one command; Harbor export</span>
+├── baselines.json
+├── ENVIRONMENT_CARD.md
+├── ANTI_HACKING.md            <span class="c"># NDA copy</span>
+└── RIGHTS.md</pre></div>
+  <div class="card"><h3>Our names and the Harbor names</h3>
+<div class="tablewrap" style="margin:0"><table style="min-width:0">
+<tr><th>Ours</th><th>Harbor</th><th>Why ours differs</th></tr>
+<tr><td>instruction.md</td><td>instruction.md</td><td>same</td></tr>
+<tr><td>task.json</td><td>task.toml</td><td>JSON instead of TOML, same fields</td></tr>
+<tr><td>environment/</td><td>environment/</td><td>same</td></tr>
+<tr><td>verifier/</td><td>tests/</td><td>says what it does</td></tr>
+<tr><td>witnesses/</td><td>solution/</td><td>full score is a space, not one answer; these prove it is reachable</td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--muted);margin:10px 0 0">run.sh converts to the Harbor layout for buyers who run Harbor directly, including task.json to task.toml. Live tier later reuses instruction.md, task.json and verifier/ unchanged; only the world moves from the colour model to real instruments.</p></div>
+</div>
+
+<footer>Supersedes v1 of this page. Full Stage 2 element list stays in 07 Data &amp; Environment §7–8. Fill the Owner column before circulating.</footer>
+</div>
+
+</body></html>
