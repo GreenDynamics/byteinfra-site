@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GD Data & Environment — Internal</title>
+<style>
+:root{--bg:#f6f5f1;--panel:#fff;--ink:#1c1c1a;--muted:#6b6a65;--line:#d9d6cd;--accent:#1f3864;--accent-ink:#fff;
+--corpus:#ececec;--comp:#dbe5f3;--phys:#dcefd6;--xc:#fbefc6;--keep:#f9dfd2;
+--corpus-ink:#444;--comp-ink:#1f3864;--phys-ink:#2b5a25;--xc-ink:#6f5200;--keep-ink:#8a3b12;--real:#2f7a3a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#383b45;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--xc:#3a3114;--keep:#3d2416;--corpus-ink:#d0d0d0;--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--xc-ink:#f0d777;--keep-ink:#f1b48f;--real:#7fd38a}}
+:root[data-theme="dark"]{--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#383b45;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--xc:#3a3114;--keep:#3d2416;--corpus-ink:#d0d0d0;--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--xc-ink:#f0d777;--keep-ink:#f1b48f;--real:#7fd38a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"PingFang SC","Noto Sans SC",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
+header{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{font-size:28px;margin:0;letter-spacing:-.01em}h1 small{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-top:4px}
+.badge{font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--keep);color:var(--keep-ink);padding:4px 10px;border-radius:4px;font-weight:700}
+h2{font-size:20px;margin:44px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-size:14px;margin:24px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+p{margin:8px 0}.lead{font-size:17px;max-width:900px}
+figure{margin:16px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 14px 10px}
+figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+/* svg classes (page CSS styles inline svg) */
+.bx{fill:var(--panel);stroke:currentColor;stroke-width:1.2}
+.bx-c{fill:var(--corpus);stroke:var(--corpus-ink);stroke-width:1.2}
+.bx-m{fill:var(--comp);stroke:var(--comp-ink);stroke-width:1.2}
+.bx-p{fill:var(--phys);stroke:var(--phys-ink);stroke-width:1.2}
+.bx-x{fill:var(--xc);stroke:var(--xc-ink);stroke-width:1.2}
+.bx-k{fill:var(--keep);stroke:var(--keep-ink);stroke-width:1.2}
+.bx-sim{fill:none;stroke:currentColor;stroke-width:1.2;stroke-dasharray:5 4}
+.bx-fit{fill:var(--phys);stroke:var(--phys-ink);stroke-width:1.2}
+.bx-real{fill:var(--real);stroke:var(--real);stroke-width:1.2}
+.t{fill:currentColor;font-size:13px}.ts{fill:currentColor;font-size:11.5px}.tb{fill:currentColor;font-size:14px;font-weight:700}
+.tm{fill:var(--muted);font-size:11.5px}.tw{fill:var(--bg);font-size:12.5px;font-weight:700}
+.tc{fill:var(--corpus-ink)}.tmc{fill:var(--comp-ink)}.tp{fill:var(--phys-ink)}.tx{fill:var(--xc-ink)}.tk{fill:var(--keep-ink)}
+.ln{stroke:currentColor;stroke-width:1.4;fill:none}.ln-d{stroke:currentColor;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+.ln-x{stroke:var(--xc-ink);stroke-width:1.4;fill:none}.ln-p{stroke:var(--phys-ink);stroke-width:2;fill:none}
+.br{stroke:currentColor;stroke-width:1.4;fill:none}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:10px 0}
+table{border-collapse:collapse;width:100%;min-width:720px}th{background:var(--accent);color:var(--accent-ink);text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:9px 10px}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top;font-size:13.5px}td:first-child{font-weight:600;white-space:nowrap}
+td.c{text-align:center}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--real)}.dot.o{background:none;border:1.5px solid var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}.card h4{margin:0 0 4px;font-size:14.5px}.card p,.card li{font-size:13.5px}.card ul{margin:4px 0 0 18px;padding:0}
+.k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+.note{border-left:4px solid var(--accent);background:var(--panel);padding:10px 14px;border-radius:6px;font-size:14px;margin:14px 0}
+ul.todo{list-style:none;padding:0;margin:0;display:grid;gap:6px}ul.todo li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 12px 8px 34px;position:relative;font-size:14px}
+ul.todo li::before{content:"";position:absolute;left:12px;top:12px;width:12px;height:12px;border:1.5px solid var(--muted);border-radius:3px}
+footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+a{color:var(--accent);text-underline-offset:3px}code{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.page-nav{display:flex;flex-wrap:wrap;gap:6px 20px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}
+.architecture-flow{display:flex;flex-direction:column;gap:0;margin:16px 0;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.architecture-band{padding:13px 16px;border-left:4px solid var(--accent);background:var(--comp);color:var(--comp-ink)}
+.architecture-band strong{display:block;font-size:15px}.architecture-band p{font-size:13px;margin:3px 0 0}
+.architecture-band.physical{background:var(--phys);color:var(--phys-ink);border-color:var(--phys-ink)}
+.architecture-band.evidence{background:var(--xc);color:var(--xc-ink);border-color:var(--xc-ink)}
+.architecture-arrow{margin:3px 0;text-align:center;font-size:13px;color:var(--muted)}
+.architecture-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.architecture-columns>div{padding:12px;border:1px solid var(--line);border-radius:5px}.architecture-columns p{font-size:13px}
+.architecture-status{font-size:13px;color:var(--muted)}
+.directory{white-space:pre;overflow-x:auto;font:12.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+@media (max-width:640px){.architecture-columns{grid-template-columns:1fr}.architecture-flow{padding:12px}}
+@media (max-width:640px){h1{font-size:22px}}
+@media (max-width:760px){figure{overflow-x:auto}figure svg{min-width:760px}}
+@media print{body{background:#fff}}
+</style>
+</head>
+<body><div class="wrap">
+
+<header>
+  <h1>Data &amp; Environment — what we are building
+    <small>Internal introduction · v2.1 · 3 Nov 2026 · Data &amp; Environment product overview · Infra project management: ByteInfra</small></h1>
+  <span class="badge">Internal — do not forward</span>
+</header>
+
+<p class="lead">We sell US and EU frontier labs two things: <b>environments</b> where a model acts and is checked, and the <b>data</b> those environments produce. Everything is sorted by one question — <b>where does the feedback come from?</b> — and placed on one loop: <b>Hypothesis → Synthesis → Characterisation → Analysis</b>. First physical scope: liquid and liquid-solid chemistry, catalogued by application (coatings, displays, energy storage, photovoltaics).</p>
+
+<nav class="page-nav" aria-label="Page sections"><a href="ByteInfra_Architecture.html">ByteInfra — Infra 规划与架构对齐</a><a href="#product-model">Data &amp; Environment product model</a><a href="#build-order">Build order</a></nav>
+
+<div class="note"><b>Scope:</b> this page explains the Data &amp; Environment business and products. Cross-business infrastructure planning and repository boundaries are maintained in <a href="ByteInfra_Architecture.html">ByteInfra</a>. Development and execution belong to the corresponding implementation repositories.</div>
+
+<!-- ============ 1 THREE KINDS ============ -->
+<h2 id="product-model">1. Three kinds, by where the feedback comes from</h2>
+<figure>
+<svg viewBox="0 0 960 430" role="img" aria-label="Three kinds of product. Corpus has no live feedback, Computational gets feedback from DFT, MD and ML surrogates, Physical gets feedback from real instruments. Computational and Physical both emit trajectory packs; expert data supplies rubrics to every verifier. Build order runs left to right: exists now, generate now, after the centralised lab.">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+    <marker id="a1x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--xc-ink)"/></marker>
+  </defs>
+  <!-- build order arrow -->
+  <line class="ln" x1="40" y1="22" x2="920" y2="22" marker-end="url(#a1)"/>
+  <text class="tm" x="160" y="14" text-anchor="middle">exists now</text>
+  <text class="tm" x="480" y="14" text-anchor="middle">generate now, before any lab</text>
+  <text class="tm" x="800" y="14" text-anchor="middle">after the centralised lab</text>
+
+
+  <!-- feedback row -->
+  <rect class="bx-sim" x="40" y="44" width="240" height="46" rx="6"/>
+  <text class="t" x="160" y="64" text-anchor="middle">none at generation</text>
+  <text class="ts" x="160" y="81" text-anchor="middle">consistency with sources</text>
+
+  <rect class="bx" x="360" y="44" width="240" height="46" rx="6"/>
+  <text class="t" x="480" y="64" text-anchor="middle">simulation tools only</text>
+  <text class="ts" x="480" y="81" text-anchor="middle">DFT · MD · simulated spectra · ML</text>
+
+  <rect class="bx-real" x="680" y="44" width="240" height="46" rx="6"/>
+  <text class="tw" x="800" y="64" text-anchor="middle">real instruments</text>
+  <text class="tw" x="800" y="81" text-anchor="middle" style="font-weight:400;font-size:11.5px">some level of real measurement</text>
+
+  <!-- arrows feedback -> kind -->
+  <line class="ln" x1="480" y1="90" x2="480" y2="132" marker-end="url(#a1)"/><text class="ts" x="488" y="116">scores</text>
+  <line class="ln" x1="800" y1="90" x2="800" y2="132" marker-end="url(#a1)"/><text class="ts" x="808" y="116">scores</text>
+
+  <!-- kind row -->
+  <rect class="bx-c" x="40" y="134" width="240" height="84" rx="8"/>
+  <text class="tb tc" x="160" y="160" text-anchor="middle">CORPUS</text>
+  <text class="ts tc" x="160" y="180" text-anchor="middle">static, structured knowledge</text>
+  <text class="ts tc" x="160" y="204" text-anchor="middle">F0–F2 · cheapest · copyable</text>
+
+  <rect class="bx-m" x="360" y="134" width="240" height="84" rx="8"/>
+  <text class="tb tmc" x="480" y="160" text-anchor="middle">COMPUTATIONAL</text>
+  <text class="ts tmc" x="480" y="180" text-anchor="middle">tool sandboxes, hidden answers</text>
+  <text class="ts tmc" x="480" y="204" text-anchor="middle">F2–F3c · volume · series name TBD</text>
+
+  <rect class="bx-p" x="680" y="134" width="240" height="84" rx="8"/>
+  <text class="tb tp" x="800" y="160" text-anchor="middle">PHYSICAL</text>
+  <text class="ts tp" x="800" y="180" text-anchor="middle">Echo → Trace → Pulse → Live</text>
+  <text class="ts tp" x="800" y="204" text-anchor="middle">F3–F5 · cannot be rebuilt</text>
+
+  <!-- arrows kind -> outputs -->
+  <line class="ln" x1="160" y1="218" x2="160" y2="262" marker-end="url(#a1)"/>
+  <line class="ln" x1="480" y1="218" x2="480" y2="262" marker-end="url(#a1)"/>
+  <line class="ln" x1="800" y1="218" x2="800" y2="262" marker-end="url(#a1)"/>
+
+  <!-- outputs -->
+  <rect class="bx" x="40" y="264" width="240" height="62" rx="6"/>
+  <text class="ts" x="160" y="286" text-anchor="middle">licensed datasets: structure–text,</text>
+  <text class="ts" x="160" y="302" text-anchor="middle">procedures, properties, QA,</text>
+  <text class="ts" x="160" y="318" text-anchor="middle">characterisation library</text>
+
+  <rect class="bx" x="360" y="264" width="240" height="62" rx="6"/>
+  <text class="ts" x="480" y="290" text-anchor="middle">Docker task packs</text>
+  <text class="ts" x="480" y="308" text-anchor="middle">+ trajectory packs</text>
+
+  <rect class="bx" x="680" y="264" width="240" height="62" rx="6"/>
+  <text class="ts" x="800" y="286" text-anchor="middle">Docker task packs (Echo/Trace/Pulse)</text>
+  <text class="ts" x="800" y="302" text-anchor="middle">hosted sessions (Live)</text>
+  <text class="ts" x="800" y="318" text-anchor="middle">+ trajectory packs (most valuable)</text>
+
+  <!-- expert band -->
+  <rect class="bx-x" x="360" y="368" width="560" height="44" rx="8"/>
+  <text class="tb tx" x="378" y="395">EXPERT DATA</text>
+  <text class="ts tx" x="490" y="395">rubrics · eval items · traces, from the university network</text>
+  <path class="ln-x" d="M440,368 L440,344 L340,344 L340,67 L358,67" marker-end="url(#a1x)"/>
+  <path class="ln-x" d="M860,368 L860,344 L940,344 L940,67 L922,67" marker-end="url(#a1x)"/>
+  <text class="ts tx" x="650" y="358" text-anchor="middle">writes the rubrics both verifiers use · also sold on its own</text>
+</svg>
+<figcaption>Read top to bottom: the feedback source decides the kind; the kind decides what we can sell. Only Computational and Physical produce trajectories. Expert data writes the rubrics every verifier uses, and is sold on its own. Fidelity levels F0–F5 are defined in section 1b.</figcaption>
+</figure>
+
+<!-- ============ 1b FIDELITY LADDER ============ -->
+<h2>1b. The fidelity ladder: F0 to F5</h2>
+<p>Fidelity answers one question: <b>how close to physical reality is the thing that checks the model?</b> Higher means harder for a buyer to rebuild, and so more valuable. Simulation is split into three levels because a neural surrogate, a semi-empirical calculation and DFT differ by orders of magnitude in cost and in how well they hold up.</p>
+<figure>
+<svg viewBox="0 0 1000 540" role="img" aria-label="Fidelity ladder from F0 to F5. F0 text, F1 human expert, F2 program check, F3a ML surrogate, F3b physics approximation, F3c first principles, F4 fitted to real lab data, F5 real measurement. Cost per check and whether a buyer can rebuild it are shown below each step. Corpus covers F0 to F2, expert data F1 to F2, Computational F2 to F3c, Physical spans F3 for Trace, F4 for Echo and Pulse, F5 for Live.">
+  <!-- steps: x0=140, w=106, gap 0, tops rise 28 per step, base 300 -->
+  <g>
+    <rect class="bx-c" x="140" y="272" width="102" height="28" rx="4"/>
+    <rect class="bx-x" x="246" y="244" width="102" height="56" rx="4"/>
+    <rect class="bx-c" x="352" y="216" width="102" height="84" rx="4"/>
+    <rect class="bx-m" x="458" y="188" width="102" height="112" rx="4"/>
+    <rect class="bx-m" x="564" y="160" width="102" height="140" rx="4"/>
+    <rect class="bx-m" x="670" y="132" width="102" height="168" rx="4"/>
+    <rect class="bx-p" x="776" y="104" width="102" height="196" rx="4"/>
+    <rect class="bx-real" x="882" y="76" width="102" height="224" rx="4"/>
+  </g>
+  <!-- level labels above each step -->
+  <text class="tb" x="191" y="264" text-anchor="middle">F0</text>
+  <text class="tb" x="297" y="236" text-anchor="middle">F1</text>
+  <text class="tb" x="403" y="208" text-anchor="middle">F2</text>
+  <text class="tb" x="509" y="180" text-anchor="middle">F3a</text>
+  <text class="tb" x="615" y="152" text-anchor="middle">F3b</text>
+  <text class="tb" x="721" y="124" text-anchor="middle">F3c</text>
+  <text class="tb" x="827" y="96" text-anchor="middle">F4</text>
+  <text class="tb" x="933" y="68" text-anchor="middle">F5</text>
+  <!-- names inside steps, near the bottom -->
+  <text class="ts tc" x="191" y="290" text-anchor="middle">text</text>
+  <text class="ts tx" x="297" y="276" text-anchor="middle">human</text><text class="ts tx" x="297" y="291" text-anchor="middle">expert</text>
+  <text class="ts tc" x="403" y="276" text-anchor="middle">program</text><text class="ts tc" x="403" y="291" text-anchor="middle">check</text>
+  <text class="ts tmc" x="509" y="276" text-anchor="middle">ML</text><text class="ts tmc" x="509" y="291" text-anchor="middle">surrogate</text>
+  <text class="ts tmc" x="615" y="276" text-anchor="middle">physics</text><text class="ts tmc" x="615" y="291" text-anchor="middle">approximation</text>
+  <text class="ts tmc" x="721" y="276" text-anchor="middle">first</text><text class="ts tmc" x="721" y="291" text-anchor="middle">principles</text>
+  <text class="ts tp" x="827" y="276" text-anchor="middle">fitted to</text><text class="ts tp" x="827" y="291" text-anchor="middle">real lab data</text>
+  <text class="tw" x="933" y="276" text-anchor="middle">real</text><text class="tw" x="933" y="291" text-anchor="middle">measurement</text>
+  <!-- arrow showing direction -->
+  <defs><marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <line class="ln" x1="150" y1="40" x2="990" y2="40" marker-end="url(#a7)"/>
+  <text class="tm" x="150" y="30">closer to reality · harder to rebuild · higher price</text>
+
+  <!-- the break: lab required -->
+  <line class="ln-d" x1="774" y1="58" x2="774" y2="388"/>
+  <text class="ts tp" x="780" y="66" style="font-weight:700">lab required →</text>
+  <!-- rows -->
+  <line stroke="currentColor" stroke-opacity=".25" x1="10" y1="300" x2="990" y2="300"/>
+  <text class="ts" x="10" y="324" style="font-weight:700">Example check</text>
+  <text class="ts" x="191" y="324" text-anchor="middle">matches source</text>
+  <text class="ts" x="297" y="324" text-anchor="middle">graded rubric</text>
+  <text class="ts" x="403" y="324" text-anchor="middle">RDKit, units</text>
+  <text class="ts" x="509" y="324" text-anchor="middle">MLIP energy</text>
+  <text class="ts" x="615" y="324" text-anchor="middle">xTB, classical MD</text>
+  <text class="ts" x="721" y="324" text-anchor="middle">DFT and above</text>
+  <text class="ts" x="827" y="324" text-anchor="middle">Echo, Pulse</text>
+  <text class="ts" x="933" y="324" text-anchor="middle">Live</text>
+
+  <text class="ts" x="10" y="350" style="font-weight:700">Cost per check</text>
+  <text class="ts" x="191" y="350" text-anchor="middle">~ 0</text>
+  <text class="ts" x="297" y="350" text-anchor="middle">expert minutes</text>
+  <text class="ts" x="403" y="350" text-anchor="middle">milliseconds</text>
+  <text class="ts" x="509" y="350" text-anchor="middle">ms–s, GPU</text>
+  <text class="ts" x="615" y="350" text-anchor="middle">seconds–minutes</text>
+  <text class="ts" x="721" y="350" text-anchor="middle">CPU-hours</text>
+  <text class="ts" x="827" y="350" text-anchor="middle">fast, after lab data</text>
+  <text class="ts" x="933" y="350" text-anchor="middle">hours of lab</text>
+
+  <text class="ts" x="10" y="376" style="font-weight:700">Buyer can rebuild?</text>
+  <text class="ts" x="191" y="376" text-anchor="middle">yes</text>
+  <text class="ts" x="297" y="376" text-anchor="middle">with a network</text>
+  <text class="ts" x="403" y="376" text-anchor="middle">yes</text>
+  <text class="ts" x="509" y="376" text-anchor="middle">yes, open models</text>
+  <text class="ts" x="615" y="376" text-anchor="middle">yes</text>
+  <text class="ts" x="721" y="376" text-anchor="middle">yes, with compute</text>
+  <text class="ts tp" x="827" y="376" text-anchor="middle" style="font-weight:700">no</text>
+  <text class="ts tp" x="933" y="376" text-anchor="middle" style="font-weight:700">no</text>
+
+  <!-- product bars -->
+  <line stroke="currentColor" stroke-opacity=".25" x1="10" y1="392" x2="990" y2="392"/>
+  <text class="ts" x="10" y="420" style="font-weight:700">Corpus</text>
+  <rect class="bx-c" x="140" y="406" width="314" height="20" rx="4"/><text class="ts tc" x="297" y="420" text-anchor="middle">structure–text, procedures, QA, properties</text>
+
+  <text class="ts" x="10" y="450" style="font-weight:700">Expert data</text>
+  <rect class="bx-x" x="246" y="436" width="208" height="20" rx="4"/><text class="ts tx" x="350" y="450" text-anchor="middle">eval items, rubrics, traces</text>
+
+  <text class="ts" x="10" y="480" style="font-weight:700">Computational</text>
+  <rect class="bx-m" x="352" y="466" width="420" height="20" rx="4"/><text class="ts tmc" x="562" y="480" text-anchor="middle">tool sandboxes (F2) → surrogate, xTB/MD, DFT environments (F3a–F3c)</text>
+
+  <text class="ts" x="10" y="510" style="font-weight:700">Physical</text>
+  <rect class="bx-sim" x="564" y="496" width="208" height="20" rx="4"/><text class="ts" x="668" y="510" text-anchor="middle">Trace</text>
+  <rect class="bx-p" x="776" y="496" width="102" height="20" rx="4"/><text class="ts tp" x="827" y="510" text-anchor="middle">Echo, Pulse</text>
+  <rect class="bx-real" x="882" y="496" width="102" height="20" rx="4"/><text class="tw" x="933" y="510" text-anchor="middle" style="font-size:11.5px">Live</text>
+</svg>
+<figcaption>Read a column top to bottom: what checks the model, what one check costs, whether a buyer could build it themselves, and which of our products sit there. The break is between F3c and F4: everything to its left can be rebuilt with open tools and compute; F4 and F5 need a lab. Trace is a Physical product scored by simulation, so it sits at F3b–F3c.</figcaption>
+</figure>
+
+<h3>Who already does Computational, and what it tells us</h3>
+<div class="tablewrap"><table>
+<tr><th>Organisation</th><th>What they offer</th><th>Level</th><th>Commercial model</th><th>Lesson for us</th></tr>
+<tr><td><a href="https://arxiv.org/abs/2505.08762">Meta FAIR — OMol25</a></td><td>100M+ DFT calculations (ωB97M-V/def2-TZVPD), 83 elements, up to 350 atoms; billions of CPU core-hours</td><td>F3c</td><td>released openly with models and evaluations</td><td>raw DFT data at scale is given away by a frontier lab; we cannot sell DFT datasets as such</td></tr>
+<tr><td>Materials Project, OQMD, AFLOW, OMat24, GNoME</td><td>millions of computed crystal structures and properties</td><td>F3c</td><td>free public databases</td><td>same: computed properties are a commodity input, not a product</td></tr>
+<tr><td><a href="https://orbitalmaterials.com/post/introducing-orb">Orbital Materials — Orb</a></td><td>fast ML interatomic potential</td><td>F3a</td><td>open model; company sells designed materials</td><td>surrogates are open and good enough to build F3a verifiers; ours must add tasks and anti-hacking, not the model</td></tr>
+<tr><td><a href="https://developer.nvidia.com/blog/building-custom-atomistic-simulation-workflows-for-chemistry-and-materials-science-with-nvidia-alchemi-toolkit/">NVIDIA ALCHEMI Toolkit</a></td><td>GPU building blocks for MLIP and MD workflows (MACE, AIMNet2, batched MD)</td><td>F3a–F3b</td><td>public library, drives GPU use</td><td>the tooling layer is free; buyers can stand up simulators themselves</td></tr>
+<tr><td><a href="https://rowansci.substack.com/p/you-can-now-subscribe-to-rowan-and">Rowan Scientific</a></td><td>cloud computational chemistry: AIMNet2, GFN2-xTB, several DFT functionals, Python API</td><td>F3a–F3c</td><td>$200/month per user, credits; academic one-third</td><td>people pay for simulation as a service, but for running calculations, not for RL tasks; low price point</td></tr>
+<tr><td><a href="https://pubs.rsc.org/dd/article/3/4/742/804957/ChemGymRL-A-customizable-interactive-framework-for">ChemGymRL</a> (academic)</td><td>open RL framework for simulated chemistry benches</td><td>F3b</td><td>open source</td><td>simulated chemistry RL environments exist as research code; none are packaged or verified for frontier-lab RL</td></tr>
+<tr><td><a href="https://arxiv.org/html/2607.19044v1">RLVR for molecular generation</a> (academic)</td><td>RL with RDKit-computed rewards: validity, QED, logP, similarity</td><td>F2</td><td>paper</td><td>the common reward today is a cheminformatics check, the bottom of our ladder</td></tr>
+</table></div>
+<div class="note"><b>What this means for the Computational kind.</b> The data and the simulators are free; nobody sells them as verified RL environments. So what we sell at F3 is the <b>task, the verifier and its anti-hacking report</b>, not the calculations. Price it as a volume product, and use it to bring buyers up the ladder to F4–F5, where nothing open competes.</div>
+
+<!-- ============ 1c ANATOMY ============ -->
+<h2>1c. Anatomy: what is inside an environment, and what counts as data</h2>
+<p>An <b>environment</b> is something a model can act in and be scored by. It has five parts: task set, interface, world, verifier, card. A dataset with no interface is data, however large. A <b>verifier</b> is a scoring system, not one program: rubric and checker produce the reward; noise model, coverage map and anti-hacking set say how far that reward can be trusted.</p>
+<figure>
+<svg viewBox="0 0 1000 500" role="img" aria-label="Anatomy of an environment. The agent sends actions through the interface to the world and receives observations back. The verifier reads the observations and the task set, scores them with a rubric and a checker, and returns a reward. Noise model, coverage map and anti-hacking set qualify the reward. Trajectories and labels flow out as data; expert rubrics and measurement sets flow in. Rubric, noise model, coverage, baselines and card ship to the buyer; checker internals and the exploit set stay with GD.">
+  <defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  <marker id="a8x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--xc-ink)"/></marker></defs>
+
+  <!-- agent -->
+  <rect class="bx" x="30" y="160" width="120" height="90" rx="10"/>
+  <text class="tb" x="90" y="198" text-anchor="middle">Agent</text>
+  <text class="ts" x="90" y="218" text-anchor="middle">buyer's model</text>
+
+  <!-- environment boundary -->
+  <rect x="200" y="40" width="780" height="330" rx="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="6 5"/>
+  <text class="tb" x="216" y="64">ENVIRONMENT</text>
+  <text class="tm" x="330" y="64">= task set + interface + world + verifier + card</text>
+
+  <!-- task set -->
+  <rect class="bx" x="220" y="84" width="380" height="44" rx="8"/>
+  <text class="tb" x="236" y="112">Task set</text>
+  <text class="ts" x="316" y="112">prompts, targets, constraints · tagged recall / generalisation</text>
+
+  <!-- interface -->
+  <rect class="bx" x="220" y="160" width="140" height="90" rx="8"/>
+  <text class="tb" x="290" y="190" text-anchor="middle">Interface</text>
+  <text class="ts" x="290" y="210" text-anchor="middle">reset / step / state</text>
+  <text class="ts" x="290" y="226" text-anchor="middle">tool list (OpenEnv)</text>
+
+  <!-- world -->
+  <rect class="bx" x="410" y="160" width="190" height="90" rx="8"/>
+  <text class="tb" x="505" y="188" text-anchor="middle">World</text>
+  <text class="ts" x="505" y="208" text-anchor="middle">sandbox · simulator ·</text>
+  <text class="ts" x="505" y="224" text-anchor="middle">twin · real lab</text>
+  <text class="tm" x="505" y="240" text-anchor="middle">(the part that differs by kind)</text>
+
+  <!-- verifier -->
+  <rect class="bx-p" x="660" y="84" width="300" height="266" rx="10"/>
+  <text class="tb tp" x="676" y="110">Verifier</text>
+  <rect class="bx-x" x="676" y="124" width="128" height="56" rx="6"/>
+  <text class="ts tx" x="740" y="145" text-anchor="middle" style="font-weight:700">Rubric</text>
+  <text class="ts tx" x="740" y="162" text-anchor="middle">criteria + weights</text>
+  <rect class="bx" x="816" y="124" width="128" height="56" rx="6"/>
+  <text class="ts" x="880" y="141" text-anchor="middle" style="font-weight:700">Checker</text>
+  <text class="ts" x="880" y="156" text-anchor="middle">program · simulation</text>
+  <text class="ts" x="880" y="170" text-anchor="middle">twin · instrument</text>
+  <text class="ts tp" x="810" y="202" text-anchor="middle">→ reward (and weight-0 metrics)</text>
+  <line class="ln-d" x1="676" y1="214" x2="944" y2="214"/>
+  <text class="tm" x="676" y="232">qualifiers — how far to trust the reward</text>
+  <rect class="bx" x="676" y="242" width="82" height="40" rx="6"/><text class="ts" x="717" y="259" text-anchor="middle">noise</text><text class="ts" x="717" y="273" text-anchor="middle">model</text>
+  <rect class="bx" x="769" y="242" width="82" height="40" rx="6"/><text class="ts" x="810" y="259" text-anchor="middle">coverage</text><text class="ts" x="810" y="273" text-anchor="middle">map</text>
+  <rect class="bx-k" x="862" y="242" width="82" height="40" rx="6"/><text class="ts tk" x="903" y="259" text-anchor="middle">anti-hacking</text><text class="ts tk" x="903" y="273" text-anchor="middle">set</text>
+  <text class="ts tp" x="810" y="318" text-anchor="middle">+ baselines: 3 models × 8 runs,</text>
+  <text class="ts tp" x="810" y="334" text-anchor="middle">human reference</text>
+
+  <!-- flows -->
+  <line class="ln" x1="150" y1="190" x2="218" y2="190" marker-end="url(#a8)"/><text class="ts" x="184" y="182" text-anchor="middle">action</text>
+  <line class="ln" x1="218" y1="222" x2="150" y2="222" marker-end="url(#a8)"/><text class="ts" x="184" y="238" text-anchor="middle">obs</text>
+  <line class="ln" x1="360" y1="190" x2="408" y2="190" marker-end="url(#a8)"/>
+  <line class="ln" x1="408" y1="222" x2="360" y2="222" marker-end="url(#a8)"/>
+  <line class="ln" x1="290" y1="128" x2="290" y2="158" marker-end="url(#a8)"/>
+  <line class="ln" x1="600" y1="106" x2="658" y2="106" marker-end="url(#a8)"/><text class="tm" x="629" y="121" text-anchor="middle">target</text>
+  <line class="ln" x1="600" y1="205" x2="658" y2="205" marker-end="url(#a8)"/><text class="tm" x="629" y="197" text-anchor="middle">obs</text>
+  <!-- reward back to agent: along the bottom of the env box -->
+  <path class="ln" d="M660,300 L630,300 L630,340 L90,340 L90,252" marker-end="url(#a8)"/>
+  <text class="ts" x="360" y="334" text-anchor="middle">reward per step / episode</text>
+
+  <!-- data in / out boxes below -->
+  <rect class="bx-x" x="30" y="410" width="400" height="60" rx="8"/>
+  <text class="tb tx" x="46" y="432">DATA IN</text>
+  <text class="ts tx" x="46" y="452">expert rubrics · measurement sets behind twins · calibration logs</text>
+  <rect class="bx-x" x="470" y="410" width="340" height="60" rx="8"/>
+  <text class="tb tx" x="486" y="432">DATA OUT</text>
+  <text class="ts tx" x="486" y="452">trajectories · scores and labels · drift and safety flags</text>
+
+  <!-- data in: enters env from below at x=505 (world) and x=740 (rubric) -->
+  <path class="ln-x" d="M430,440 L450,440 L450,384 L505,384 L505,252" marker-end="url(#a8x)" fill="none"/>
+  <path class="ln-x" d="M450,384 L740,384 L740,352" marker-end="url(#a8x)" fill="none"/>
+  <text class="tm" x="250" y="398" text-anchor="middle">measurements → world · rubrics → verifier</text>
+  <!-- data out: from verifier down to DATA OUT -->
+  <path class="ln-x" d="M903,352 L903,396 L640,396 L640,408" marker-end="url(#a8x)" fill="none"/>
+
+  <!-- legend -->
+  <rect class="bx-k" x="840" y="416" width="16" height="12" rx="2"/><text class="ts" x="862" y="426">kept — never ships</text>
+  <rect class="bx-x" x="840" y="438" width="16" height="12" rx="2"/><text class="ts" x="862" y="448">expert-authored / data</text>
+  <text class="tm" x="840" y="468">checker internals never ship</text>
+</svg>
+<figcaption>Only the world changes between kinds: a tool sandbox (Computational), a regression or simulator or grounded twin (Echo, Trace, Pulse), or the lab itself (Live). The rubric is written once per task family and reused across every tier; the checker is what gets swapped. A Live trajectory is the one data product whose checker a buyer cannot rerun, which is why it prices highest.</figcaption>
+</figure>
+
+<h3>What each kind contains</h3>
+<div class="tablewrap"><table>
+<tr><th>Component</th><th>Corpus</th><th>Computational</th><th>Echo</th><th>Trace</th><th>Pulse</th><th>Live</th></tr>
+<tr><td>Environment?</td><td>no</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td><td>yes, hosted</td></tr>
+<tr><td>Task set</td><td>QA items with reference answers</td><td>hidden-answer tasks over tool outputs; compute budget</td><td>target property, allowed ranges</td><td>target + action grammar + fixed protocol</td><td>as Trace</td><td>as Trace</td></tr>
+<tr><td>Interface / tools</td><td>none (files)</td><td>OpenEnv; structure DBs, cheminformatics, MLIP, xTB, DFT runner, workspace</td><td>OpenEnv; propose_recipe, query_history</td><td>OpenEnv; dispense, mix, heat, coat, measure, abort</td><td>as Trace</td><td>as Trace, routed to instruments</td></tr>
+<tr><td>World</td><td>none</td><td>the tool sandbox; results computed or cached</td><td>regression fitted to real outcomes</td><td>simulated procedure with instrument model</td><td>step models fitted to real runs; real noise, drift scenarios</td><td>equipment, materials, instruments</td></tr>
+<tr><td>Rubric</td><td>answer match; source-span support</td><td>correctness vs hidden answer; budget; tool-use validity</td><td>closeness to target; efficiency</td><td>per-step feasibility and safety; terminal closeness; efficiency</td><td>as Trace + drift detection</td><td>as Pulse</td></tr>
+<tr><td>Checker</td><td>program (F2)</td><td>program (F2) or simulation (F3a–c)</td><td>twin prediction (F4)</td><td>simulator (F3b–c)</td><td>grounded twin (F4)</td><td>instrument reading (F5)</td></tr>
+<tr><td>Noise model</td><td>—</td><td>numerical tolerance</td><td>held-out error of the regression</td><td>instrument-model parameters</td><td>measured repeatability and drift</td><td>the instrument; repeated runs</td></tr>
+<tr><td>Coverage map</td><td>provenance, date range</td><td>element and size range of the simulator</td><td>fitted region of task space</td><td>validity range of the simulator</td><td>fitted region + measured drift range</td><td>materials and instrument availability</td></tr>
+<tr><td>Safety</td><td>—</td><td>resource limits</td><td>out-of-range refusal</td><td>forbidden mixes, ranges, sequences</td><td>as Trace + instrument limits</td><td>as Pulse, enforced by interlocks and humans</td></tr>
+<tr><td>Data in</td><td>literature, structure DBs, measurements</td><td>reference solutions, cached simulation</td><td>measurement set behind the regression</td><td>expert step-feasibility rubrics</td><td>real runs; calibration logs</td><td>materials lots; calibration logs</td></tr>
+<tr><td>Data out</td><td>the records</td><td>items, agent trajectories (tool calls, files), labels</td><td>items, episode trajectories, scores</td><td>step-level trajectories, safety flags</td><td>as Trace + drift episodes</td><td>full observation stream: images, spectra, readings, instrument state, human interventions</td></tr>
+<tr><td>Expert data used</td><td>QA review; theory corpus</td><td>task authoring; reference solutions</td><td>target selection</td><td>step-feasibility rubrics</td><td>as Trace</td><td>as Trace + lab-record labels for failure diagnosis</td></tr>
+</table></div>
+
+<!-- ============ 2 PHYSICAL TIERS ============ -->
+<h2>2. The Physical series: how much of the real lab is in the loop</h2>
+<figure>
+<svg viewBox="0 0 960 360" role="img" aria-label="Four Physical tiers compared. Echo: synthesis and characterisation are regressions fitted to real outcomes, verifies the result. Trace: both stages simulated, verifies each step. Pulse: step models and instrument noise fitted to real runs, verifies each step against this lab. Live: real lab and real instrument, verifies what actually happens. Echo screens, Pulse gates access to Live.">
+  <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <!-- column heads -->
+  <text class="tb" x="265" y="28" text-anchor="middle">Echo</text><text class="tm" x="265" y="44" text-anchor="middle">outcome twin · F4</text>
+  <text class="tb" x="445" y="28" text-anchor="middle">Trace</text><text class="tm" x="445" y="44" text-anchor="middle">process twin · F3b–F3c</text>
+  <text class="tb" x="625" y="28" text-anchor="middle">Pulse</text><text class="tm" x="625" y="44" text-anchor="middle">grounded process twin · F4</text>
+  <text class="tb" x="805" y="28" text-anchor="middle">Live</text><text class="tm" x="805" y="44" text-anchor="middle">the real lab · F5</text>
+  <!-- row labels -->
+  <text class="t" x="20" y="88">Synthesis</text>
+  <text class="t" x="20" y="148">Characterisation</text>
+  <text class="t" x="20" y="208">Verifier checks</text>
+  <text class="t" x="20" y="262">Delivered as</text>
+  <!-- synthesis row -->
+  <rect class="bx-fit" x="185" y="64" width="160" height="44" rx="6"/><text class="ts tp" x="265" y="83" text-anchor="middle">regression on real</text><text class="ts tp" x="265" y="98" text-anchor="middle">outcomes</text>
+  <rect class="bx-sim" x="365" y="64" width="160" height="44" rx="6"/><text class="ts" x="445" y="83" text-anchor="middle">simulated steps,</text><text class="ts" x="445" y="98" text-anchor="middle">feasibility rules</text>
+  <rect class="bx-fit" x="545" y="64" width="160" height="44" rx="6"/><text class="ts tp" x="625" y="83" text-anchor="middle">step models fitted</text><text class="ts tp" x="625" y="98" text-anchor="middle">to real runs</text>
+  <rect class="bx-real" x="725" y="64" width="160" height="44" rx="6"/><text class="tw" x="805" y="91" text-anchor="middle">real equipment</text>
+  <!-- char row -->
+  <rect class="bx-fit" x="185" y="124" width="160" height="44" rx="6"/><text class="ts tp" x="265" y="143" text-anchor="middle">predicted result</text><text class="ts tp" x="265" y="158" text-anchor="middle">+ uncertainty</text>
+  <rect class="bx-sim" x="365" y="124" width="160" height="44" rx="6"/><text class="ts" x="445" y="143" text-anchor="middle">simulated measurement,</text><text class="ts" x="445" y="158" text-anchor="middle">instrument model</text>
+  <rect class="bx-fit" x="545" y="124" width="160" height="44" rx="6"/><text class="ts tp" x="625" y="143" text-anchor="middle">real noise, drift,</text><text class="ts tp" x="625" y="158" text-anchor="middle">calibration</text>
+  <rect class="bx-real" x="725" y="124" width="160" height="44" rx="6"/><text class="tw" x="805" y="151" text-anchor="middle">real instrument</text>
+  <!-- verifier row -->
+  <text class="t" x="265" y="212" text-anchor="middle">the result</text>
+  <text class="t" x="445" y="212" text-anchor="middle">each step: safe, feasible, ordered</text>
+  <text class="t" x="625" y="204" text-anchor="middle">each step against</text><text class="t" x="625" y="220" text-anchor="middle">this lab's behaviour</text>
+  <text class="t" x="805" y="212" text-anchor="middle">what actually happens</text>
+  <!-- delivered row -->
+  <text class="ts" x="265" y="266" text-anchor="middle">Docker buy-out</text>
+  <text class="ts" x="445" y="266" text-anchor="middle">Docker buy-out</text>
+  <text class="ts" x="625" y="266" text-anchor="middle">Docker or hosted</text>
+  <text class="ts" x="805" y="266" text-anchor="middle">hosted sessions, exclusive windows</text>
+  <!-- gates -->
+  <path class="ln-p" d="M625,284 C625,324 805,324 805,290" marker-end="url(#a2)"/>
+  <text class="ts tp" x="715" y="344" text-anchor="middle" style="font-weight:700">Pulse gates access to Live</text>
+  <text class="ts" x="265" y="300" text-anchor="middle">cheapest entry SKU;</text><text class="ts" x="265" y="315" text-anchor="middle">screens agents before lab time</text>
+  <text class="ts" x="445" y="300" text-anchor="middle">sold until enough real runs exist,</text><text class="ts" x="445" y="315" text-anchor="middle">then upgraded to Pulse</text>
+  <!-- legend -->
+  <rect class="bx-sim" x="20" y="336" width="18" height="12" rx="2"/><text class="ts" x="44" y="346">simulated</text>
+  <rect class="bx-fit" x="110" y="336" width="18" height="12" rx="2"/><text class="ts" x="134" y="346">fitted to real data</text>
+  <rect class="bx-real" x="240" y="336" width="18" height="12" rx="2"/><text class="ts" x="264" y="346">real</text>
+</svg>
+<figcaption>The tiers differ only in how much of each stage is real. Moving right, a buyer pays more because less can be reproduced elsewhere. Safety and drift tests live in Pulse: it is the first tier a regression model cannot imitate. Live trajectories are the highest-value data we produce.</figcaption>
+</figure>
+
+<!-- ============ 3 LOOP AND SCOPES ============ -->
+<h2>3. One loop, three task scopes</h2>
+<figure>
+<svg viewBox="0 0 960 340" role="img" aria-label="The research loop Hypothesis, Synthesis, Characterisation, Analysis, with Analysis feeding back to Hypothesis. Verification tasks cover Characterisation to Analysis with the sample given. Realisation tasks cover Synthesis to Analysis with a target given. Discovery covers the full loop from an open question.">
+  <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <!-- loop boxes -->
+  <rect class="bx" x="40" y="40" width="190" height="64" rx="8"/><text class="tb" x="135" y="66" text-anchor="middle">H · Hypothesis</text><text class="ts" x="135" y="86" text-anchor="middle">theory and computation</text>
+  <rect class="bx" x="270" y="40" width="190" height="64" rx="8"/><text class="tb" x="365" y="66" text-anchor="middle">S · Synthesis</text><text class="ts" x="365" y="86" text-anchor="middle">liquid, liquid-solid</text>
+  <rect class="bx" x="500" y="40" width="190" height="64" rx="8"/><text class="tb" x="595" y="66" text-anchor="middle">C · Characterisation</text><text class="ts" x="595" y="86" text-anchor="middle">XRD, UV-vis, PL, SEM, DSC</text>
+  <rect class="bx" x="730" y="40" width="190" height="64" rx="8"/><text class="tb" x="825" y="66" text-anchor="middle">A · Analysis</text><text class="ts" x="825" y="86" text-anchor="middle">phase, property, cause</text>
+  <line class="ln" x1="230" y1="72" x2="268" y2="72" marker-end="url(#a3)"/>
+  <line class="ln" x1="460" y1="72" x2="498" y2="72" marker-end="url(#a3)"/>
+  <line class="ln" x1="690" y1="72" x2="728" y2="72" marker-end="url(#a3)"/>
+  <path class="ln-d" d="M825,40 L825,18 L135,18 L135,38" marker-end="url(#a3)"/>
+  <text class="tm" x="480" y="13" text-anchor="middle">result informs the next hypothesis</text>
+
+  <!-- Verification bracket C->A -->
+  <path class="br" d="M500,128 L500,138 L920,138 L920,128"/>
+  <rect class="bx-m" x="500" y="150" width="420" height="44" rx="6"/>
+  <text class="tb tmc" x="516" y="170">Verification</text><text class="ts tmc" x="620" y="170">agent acts in C → A · sample or data given</text>
+  <text class="ts tmc" x="516" y="186">V1–V5 · labels are the verifier · build first</text>
+
+  <!-- Realisation bracket S->A -->
+  <path class="br" d="M270,212 L270,222 L920,222 L920,212"/>
+  <rect class="bx-p" x="270" y="234" width="650" height="44" rx="6"/>
+  <text class="tb tp" x="286" y="254">Realisation</text><text class="ts tp" x="390" y="254">agent acts in S → C → A · target property given</text>
+  <text class="ts tp" x="286" y="270">S1–S3 starter, R1–R6 research · measured property vs target, plus step checks</text>
+  <line class="ln" x1="210" y1="256" x2="268" y2="256" marker-end="url(#a3)"/><text class="ts" x="148" y="260" text-anchor="middle">target</text>
+
+  <!-- Discovery bracket H->A -->
+  <path class="br" d="M40,296 L40,306 L920,306 L920,296"/>
+  <text class="tb" x="40" y="330">Discovery</text><text class="ts" x="128" y="330">agent acts in H → S → C → A · open question and budget · premium, not catalogued in v1</text>
+</svg>
+<figcaption>Every task is a slice of the same loop. The scope says which stages the agent controls; the tier (section 2) says how each stage is produced. Scope and tier are independent, so the catalogue is a grid: section 4.</figcaption>
+</figure>
+
+<!-- ============ 4 CATALOGUE GRID ============ -->
+<h2>4. Task families and where they sit</h2>
+<p>Filled dot = the tier we plan to sell for that family; open dot = possible later. Priority within each block is the row order.</p>
+<div class="tablewrap"><table>
+<tr><th>#</th><th>Task family</th><th>Scope</th><th>Verified by</th><th>Comp.</th><th>Echo</th><th>Trace</th><th>Pulse</th><th>Live</th><th>Status</th></tr>
+<tr><td>S1</td><td>Colour mixing to a target RGB</td><td>Realisation · starter</td><td>camera or spectrometer</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td>live, multiple sites</td></tr>
+<tr><td>S2</td><td>pH control, reach and hold</td><td>Realisation · starter</td><td>pH probe</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td>live</td></tr>
+<tr><td>S3</td><td>Viscosity at set temperature</td><td>Realisation · starter</td><td>viscometer, rheometer</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"><span class="dot o"></span></td><td class="c"><span class="dot o"></span></td><td>to set up</td></tr>
+<tr><td>V1</td><td>Diffraction → phase and impurity</td><td>Verification</td><td>ICSD or refined label</td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot o"></span></td><td class="c"><span class="dot o"></span></td><td>Computational first</td></tr>
+<tr><td>V2</td><td>Optical spectra → property, defects</td><td>Verification</td><td>labelled set</td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot o"></span></td><td class="c"><span class="dot o"></span></td><td>Computational first</td></tr>
+<tr><td>V3</td><td>Microscopy → morphology grade</td><td>Verification</td><td>expert label</td><td class="c"></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td>needs images</td></tr>
+<tr><td>V4</td><td>Failure diagnosis, full char set</td><td>Verification</td><td>lab record</td><td class="c"></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td>needs lab record</td></tr>
+<tr><td>V5</td><td>Computation vs measurement</td><td>Verification</td><td>expert label</td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot o"></span></td><td class="c"></td><td>bridge to Discovery</td></tr>
+<tr><td>R1</td><td>Nanocrystal synthesis → target emission</td><td>Realisation</td><td>PL peak, FWHM</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td>priority 1</td></tr>
+<tr><td>R2</td><td>Thin-film coating → optical/electrical target</td><td>Realisation</td><td>bandgap, sheet resistance, XRD</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td>priority 2</td></tr>
+<tr><td>R3</td><td>Thermoset formulation → cure, hardness</td><td>Realisation</td><td>DSC, hardness, gel time</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td>priority 3</td></tr>
+<tr><td>R4</td><td>Electrolyte → conductivity</td><td>Realisation</td><td>impedance</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td class="c"></td><td>later</td></tr>
+<tr><td>R5</td><td>Crystallisation → size or polymorph</td><td>Realisation</td><td>DLS, XRD</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td class="c"></td><td>later</td></tr>
+<tr><td>R6</td><td>Solution catalysis → yield</td><td>Realisation</td><td>HPLC, GC</td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot o"></span></td><td class="c"></td><td>later</td></tr>
+</table></div>
+<h3>Trustworthiness suite — future SKU for safety teams</h3>
+<p>The current safety suite covers physical constraints and drift. Safety teams at the same labs buy a broader set; the lab-agent version of the eight-perspective text-model trust evaluations is:</p>
+<div class="tablewrap"><table>
+<tr><th>Perspective</th><th>What the agent must do</th><th>Scored by</th></tr>
+<tr><td>Constraint adherence</td><td>respect forbidden mixes, ranges and sequences even under pressure to hit the target</td><td>violation count and severity</td></tr>
+<tr><td>OOD instrument</td><td>notice readings outside the calibrated range and stop or flag</td><td>detection rate, false stops</td></tr>
+<tr><td>Adversarial instructions</td><td>ignore unsafe or off-task instructions embedded in protocols, lab notes or tool outputs</td><td>compliance with injected instructions</td></tr>
+<tr><td>Recipe confidentiality</td><td>not leak proprietary recipes or partner data into logs or other episodes</td><td>leakage checks on outputs</td></tr>
+<tr><td>Honesty on failure</td><td>report a failed or missing measurement rather than fill it in</td><td>fabrication rate vs ground truth</td></tr>
+<tr><td>Hazard refusal</td><td>decline syntheses or conditions on the hazard list, with reason</td><td>refusal rate and quality</td></tr>
+</table></div>
+<p>Add-on to any Trace, Pulse or Live pack; build after the first Pulse family has baselines. Nobody offers this for lab agents today.</p>
+<p>Families chosen for two reasons: <b>path dependence</b> (order and timing change the result, so process verifiers and trajectories are worth paying for) and <b>verifier latency under two hours</b> (several Live episodes per day). The open benchmark keeps free public versions of S1–S2; paid versions add tasks, drift scenarios and full trajectories.</p>
+
+<!-- ============ 5 WHAT CROSSES ============ -->
+<h2>5. What the buyer gets, what we keep</h2>
+<figure>
+<svg viewBox="0 0 960 300" role="img" aria-label="Boundary between GreenDynamics and the buyer. Environments, verifier reports and trajectory packs cross to the buyer. Verifier internals, alignment algorithms and the data pipeline stay inside GreenDynamics. The buyer may grant an optional white-box API back, under NDA and destruction terms. Training and inference stay on the buyer's infrastructure.">
+  <defs>
+    <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+  </defs>
+  <text class="tb" x="40" y="28">GreenDynamics (AU / HK entity, data outside mainland China)</text>
+  <text class="tb" x="640" y="28">Frontier lab (US / EU)</text>
+  <line class="ln-d" x1="560" y1="12" x2="560" y2="290"/>
+  <text class="tm" x="554" y="286" text-anchor="end">contract boundary</text>
+
+  <!-- kept -->
+  <rect class="bx-k" x="40" y="48" width="190" height="150" rx="8"/>
+  <text class="tb tk" x="135" y="72" text-anchor="middle">KEPT — never sold</text>
+  <text class="ts tk" x="135" y="100" text-anchor="middle">verifier internals</text>
+  <text class="ts tk" x="135" y="124" text-anchor="middle">alignment algorithms</text>
+  <text class="ts tk" x="135" y="148" text-anchor="middle">data pipeline</text>
+  <text class="ts tk" x="135" y="172" text-anchor="middle">holdout sets</text>
+  <line class="ln" x1="230" y1="123" x2="298" y2="123" marker-end="url(#a5)"/><text class="tm" x="262" y="113" text-anchor="middle">powers</text>
+
+  <!-- sellable -->
+  <rect class="bx" x="300" y="48" width="220" height="44" rx="6"/><text class="t" x="410" y="75" text-anchor="middle">environments</text>
+  <rect class="bx" x="300" y="102" width="220" height="44" rx="6"/><text class="t" x="410" y="129" text-anchor="middle">verifier report + baselines</text>
+  <rect class="bx" x="300" y="156" width="220" height="44" rx="6"/><text class="t" x="410" y="183" text-anchor="middle">trajectory, expert, corpus data</text>
+
+  <!-- buyer -->
+  <rect class="bx" x="640" y="48" width="280" height="152" rx="8"/>
+  <text class="tb" x="780" y="74" text-anchor="middle">buyer's own infrastructure</text>
+  <text class="ts" x="780" y="100" text-anchor="middle">RL training · inference · evals</text>
+  <text class="ts" x="780" y="124" text-anchor="middle">runs Docker envs locally,</text>
+  <text class="ts" x="780" y="140" text-anchor="middle">or calls hosted Live sessions</text>
+
+  <line class="ln" x1="520" y1="70" x2="638" y2="70" marker-end="url(#a5)"/><text class="ts" x="579" y="62" text-anchor="middle">Docker / hosted</text>
+  <line class="ln" x1="520" y1="124" x2="638" y2="124" marker-end="url(#a5)"/><text class="ts" x="579" y="116" text-anchor="middle">card + report</text>
+  <line class="ln" x1="520" y1="178" x2="638" y2="178" marker-end="url(#a5)"/><text class="ts" x="579" y="170" text-anchor="middle">data packs</text>
+
+  <path class="ln-d" d="M780,200 L780,246 L410,246 L410,202" marker-end="url(#a5)"/>
+  <text class="ts" x="576" y="266">optional white-box API for evaluation runs</text>
+  <text class="tm" x="576" y="282">NDA + destruction clause · buyer keeps trajectories</text>
+</svg>
+<figcaption>The verifier is the product's core, so it never crosses the boundary: buyers get the environment, a report on how robust the verifier is, and the data. Training and inference stay on their side.</figcaption>
+</figure>
+
+<!-- ============ 6 BUILD ORDER ============ -->
+<h2 id="build-order">6. Build order</h2>
+<div class="note"><b>Current execution scope:</b> the diagram below is the broader product roadmap. The immediate data and environment samples follow <a href="First%20Sample%20Kit.html">First Sample Kit v2</a>. Full-pack requirements and later tiers do not hold up the first sample, and roadmap labels are not evidence that a delivery is complete.</div>
+<figure>
+<svg viewBox="0 0 960 300" role="img" aria-label="Build order in four phases. Now: corpus licensing, Computational V1 and V2, expert data pack, starter tasks S1 and S2 live. In about one month: first runnable Echo sample in OpenEnv with anti-hacking report and baselines. When the centralised lab runs: Trace and Pulse for R1 to R3, Live sessions, trajectory packs. After Realisation is proven: Discovery tier and exclusive hosted windows.">
+  <defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <line class="ln" x1="30" y1="58" x2="935" y2="58" marker-end="url(#a6)"/>
+  <circle cx="130" cy="58" r="8" fill="var(--real)"/>
+  <circle cx="360" cy="58" r="8" fill="var(--phys)" stroke="var(--phys-ink)" stroke-width="1.5"/>
+  <circle cx="590" cy="58" r="8" fill="var(--panel)" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="820" cy="58" r="8" fill="var(--panel)" stroke="currentColor" stroke-width="1.5"/>
+  <text class="tb" x="130" y="34" text-anchor="middle">Now</text>
+  <text class="tb" x="360" y="34" text-anchor="middle">~1 month</text>
+  <text class="tb" x="590" y="34" text-anchor="middle">Centralised lab runs</text>
+  <text class="tb" x="820" y="34" text-anchor="middle">Realisation proven</text>
+
+  <rect class="bx" x="30" y="80" width="200" height="150" rx="8"/>
+  <text class="ts" x="44" y="104">Corpus datasets licensed</text>
+  <text class="ts" x="44" y="128">Computational V1, V2</text>
+  <text class="ts" x="44" y="152">Expert data pack, one family</text>
+  <text class="ts" x="44" y="176">S1, S2 starter tasks live</text>
+  <text class="ts" x="44" y="200">Legal: licences, disclosure</text>
+
+  <rect class="bx-p" x="260" y="80" width="200" height="150" rx="8"/>
+  <text class="ts tp" x="274" y="104">First runnable Echo sample</text>
+  <text class="ts tp" x="274" y="128">OpenEnv package</text>
+  <text class="ts tp" x="274" y="152">Anti-hacking report</text>
+  <text class="ts tp" x="274" y="176">3 models × 8 runs baselines</text>
+  <text class="ts tp" x="274" y="200">First buyer conversation</text>
+
+  <rect class="bx" x="490" y="80" width="200" height="150" rx="8"/>
+  <text class="ts" x="504" y="104">Trace, Pulse for R1–R3</text>
+  <text class="ts" x="504" y="128">Live sessions, Pulse-gated</text>
+  <text class="ts" x="504" y="152">Trajectory packs (T1)</text>
+  <text class="ts" x="504" y="176">V3, V4 from lab records</text>
+  <text class="ts" x="504" y="200">S3 viscosity added</text>
+
+  <rect class="bx" x="720" y="80" width="200" height="150" rx="8"/>
+  <text class="ts" x="734" y="104">Discovery tier (R1 or R2</text>
+  <text class="ts" x="734" y="120">with the target removed)</text>
+  <text class="ts" x="734" y="152">Exclusive hosted windows</text>
+  <text class="ts" x="734" y="176">Commissioned sets</text>
+  <text class="ts" x="734" y="200">R4–R6</text>
+
+  <text class="tm" x="245" y="258" text-anchor="middle">gate: sample passes</text>
+  <text class="tm" x="245" y="273" text-anchor="middle">its own anti-hacking test</text>
+  <text class="tm" x="475" y="258" text-anchor="middle">gate: equipment for</text>
+  <text class="tm" x="475" y="273" text-anchor="middle">R1–R3 calibrated</text>
+  <text class="tm" x="705" y="258" text-anchor="middle">gate: Realisation cards</text>
+  <text class="tm" x="705" y="273" text-anchor="middle">have baselines</text>
+</svg>
+<figcaption>Everything in the first column can start without the lab. The one artefact that unlocks sales is the runnable Echo sample with its anti-hacking report: that is what a frontier lab's RL team tests on the first call.</figcaption>
+</figure>
+
+<!-- ============ 7 WHAT SHIPS ============ -->
+<h2>7. What every product ships with</h2>
+<div class="grid">
+  <div class="card"><h4>Environment Card — every environment</h4>
+    <p><b>Identity</b> name, tier and fidelity, application, loop scope, version · <b>Task</b> goal, task space, fixed protocol, task rows, <b>recall / generalisation split</b> · <b>Interface</b> OpenEnv reset/step/state, tools, Docker, footprint, <b>harness mapping</b> (Scenario = task pack, Adapter = OpenEnv client, Executor = buyer sandbox or GD lab scheduler, Metrics = verifier report), <b>self-hosted run</b> (PBS or Slurm, no outbound network), <b>full-pack GPU-hours</b> · <b>Verifier</b> rubric, noise model, coverage statement, anti-hacking report, safety constraints · <b>Baselines</b> ≥3 models × 8 runs, human reference · <b>Provenance</b> data behind the twin, reproducibility file · <b>Rights</b> · <b>Support</b>.</p>
+    <p class="k">Not sellable if empty</p><p>Coverage statement · anti-hacking report · baselines</p></div>
+  <div class="card"><h4>Data Sheet — every data product</h4>
+    <p>Follows <i>Datasheets for Datasets</i>: unit of data, count and success/failure split, <b>recall / generalisation tag per item</b>, per-unit schema, raw files, how produced, instruments, human involvement, cleaning, labels, known issues, validation, intended and unsuitable uses, delivery · plus <b>Rights</b> (licence, provenance of rights, jurisdiction).</p>
+    <p class="k">Not sellable if empty</p><p>Per-unit schema · validation · provenance of rights</p></div>
+</div>
+<div class="grid" style="margin-top:12px">
+  <div class="card"><h4>Why these four were added</h4><ul>
+    <li><b>Recall vs generalisation.</b> Tag each item as answerable from public data the model has seen, or new. Verification packs and expert data target ≥ 50 % generalisation; it is the cheapest honest difficulty control and the one contamination check buyers trust.</li>
+    <li><b>Harness mapping.</b> Lab eval teams think in Runner / Scenario / Adapter / Executor / Metrics. Naming where our pack sits in that stack removes a week of integration questions.</li>
+    <li><b>Self-hosted under PBS or Slurm, no phone-home.</b> Evaluation frameworks that only worked as hosted services were dropped by HPC users; the harness that ran on their own cluster was kept. Hard requirement for every Computational, Echo, Trace and Pulse SKU.</li>
+    <li><b>Full-pack cost.</b> Per-instance footprint is not enough; the buyer's infra team asks "how many GPU-hours for one complete run". State it.</li></ul></div>
+  <div class="card"><h4>Lineage worth citing</h4><p>The Corpus evidence-QA line descends from the generate-then-verify pipelines (Darwin-SIG, MatSci-Instruct, 2023–24): a generator model writes QA pairs from full-text papers and a separate verifier model checks accuracy and relevance. Cite the published versions, not internal decks.</p></div>
+</div>
+<div class="note"><b>provenance_type</b> on every record and step: expert explanation · agent-generated reasoning · instrument observation · simulation output · human intervention. A written explanation is never recorded as the trace of how a decision was made.</div>
+<div class="note">Per-step trajectory record: timestamp and step index · provenance_type of each field · agent message and tool call · raw observation (images, spectra, readings with units) · instrument state and drift flag · verifier output and version · safety events · human intervention and reason · run metadata. Raw files plus a JSONL index; nothing summarised at capture.</div>
+
+<h3>Four worked samples (in the Skeleton doc)</h3>
+<div class="tablewrap"><table>
+<tr><th>Sample</th><th>Kind / tier</th><th>Scope</th><th>What it shows</th></tr>
+<tr><td>Echo-NanocrystalEmission</td><td>Physical · Echo · F4</td><td>Realisation</td><td>cheapest entry; recipe in, predicted spectrum out; out-of-range queries end with zero reward; agent vs random, BO and warm-started BO at equal budget, success at k = 1, 3, 5, 12</td></tr>
+<tr><td>Pulse-ThinFilmCoating</td><td>Physical · Pulse · F4</td><td>Realisation</td><td>step-by-step tools; per-step safety and feasibility; hidden drift episodes that reward agents who notice</td></tr>
+<tr><td>T1-Live-ThinFilmCoating</td><td>Trajectory pack · F5</td><td>Realisation</td><td>50 real episodes, success and failure; full observation stream; 10 % re-read by a scientist</td></tr>
+<tr><td>D-Expert-ThinFilmCoating</td><td>Expert data · F1–F2</td><td>—</td><td>eval items, procedure rubrics, reasoning traces; two reviewers; filtered against frontier models; can start before the lab</td></tr>
+</table></div>
+
+<!-- ============ 8 COMMERCIAL ============ -->
+<h2>8. Commercial rules</h2>
+<div class="tablewrap"><table>
+<tr><th>Rule</th><th>Decision</th></tr>
+<tr><td>Buyers</td><td>US and EU frontier labs and large model companies only. No mainland China buyers, no small labs.</td></tr>
+<tr><td>Entity and data</td><td>AU or HK entity contracts; all data produced and held outside mainland China.</td></tr>
+<tr><td>Infrastructure</td><td>Buyer runs training and inference; we supply environments, tooling and hardware access.</td></tr>
+<tr><td>Exclusivity</td><td>Non-exclusive 1× by default · time-limited 2.5–3× (2–3 months) · perpetual only for commissioned sets, FrontierMath model: we keep a holdout and publication rights.</td></tr>
+<tr><td>Pricing</td><td>Ranges held internally; every quote scoped per deal; no public price list. Market anchors: $200–2,000 per task · ~$10k per cross-site physical trajectory · $500–5,000 per expert eval item.</td></tr>
+<tr><td>Acceptance</td><td>Agreed in writing before delivery; all five must pass. <b>Label quality</b>: two independent reviewers, adjudication, agreement ≥ [κ 0.8], critical-error rate ≤ [1 %] on a buyer-drawn audit sample · <b>Schema completeness</b>: every required field valid, raw evidence on every item, provenance_type on every record · <b>Reproducibility</b>: re-runs within the stated noise model; operational numbers met (latency distribution, concurrency, reset, failed-job rate, complete-run cost; for Live also prep, cleaning, calibration, repeats) · <b>Leakage controls</b>: no public or prior-delivery duplicates, search report attached, holdout never released · <b>Usefulness</b>: evaluation usefulness (separates models; holdout-variant scores track main set) or training uplift on a buyer-held benchmark, chosen per deal. A gap between two models or a mid-range reward is not acceptance evidence.</td></tr>
+<tr><td>Transparency</td><td>Token use, tool-call log, per-episode trace, physical conditions, verifier version with every run.</td></tr>
+<tr><td>Rights provenance</td><td>Our own production, or bought under a licence that is perpetual, worldwide, sublicensable, covers AI training and resale of derivatives.</td></tr>
+</table></div>
+
+<h3>Default first targets (replace with real names)</h3>
+<div class="tablewrap"><table>
+<tr><th>#</th><th>Organisation</th><th>Team</th><th>Why first</th></tr>
+<tr><td>1</td><td>Google DeepMind</td><td>science, RL environments</td><td>largest stated appetite for environments</td></tr>
+<tr><td>2</td><td>Meta</td><td>post-training environments</td><td>buys at scale; backs OpenEnv</td></tr>
+<tr><td>3</td><td>Microsoft Research AI for Science</td><td>materials, lab automation</td><td>needs physical verification it does not own</td></tr>
+<tr><td>4</td><td>Mistral or another EU lab</td><td>post-training</td><td>EU buyer; less crowded</td></tr>
+</table></div>
+<p>Anthropic and OpenAI later: hardest to enter, and worth more once a public benchmark result exists.</p>
+
+<!-- ============ 9 OPEN ============ -->
+<h2>9. Open before any buyer sees this</h2>
+<ul class="todo">
+  <li>Replace bracketed placeholders in the sample cards with real ranges, counts and instrument errors</li>
+  <li>Confirm the top three Realisation families with the lab lead; they set the first equipment list</li>
+  <li>Pick a series name for the Computational kind (working name: Sim)</li>
+  <li>Internal price ranges per product and a walk-away floor</li>
+  <li>Engineering owner for OpenEnv packaging and the verifier library</li>
+  <li>Legal: licence wording for purchased data and publisher-derived corpus; contributor disclosure text; entity (AU or HK)</li>
+  <li>Build the runnable Echo sample and its anti-hacking report</li>
+  <li>Fill full-pack GPU-hour figures and the recall / generalisation split once the first Echo pack exists</li>
+</ul>
+
+<footer>Cross-business Infra project management is maintained separately in GreenDynamics/byteinfra. Immediate sample scope: First Sample Kit v2, 2 Nov 2026. Standards followed: OpenEnv (interface, packaging), Prime Intellect verifiers (task and rubric anatomy), Datasheets for Datasets (data documentation). Companion references: 04 product structure, 05 vendor references, 08 external catalogue. Internal working document.</footer>
+</div></body></html>
