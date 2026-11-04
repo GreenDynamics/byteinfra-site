@@ -1,5 +1,5 @@
 {
-  "revision": "1a111472e9e97a8c38ad3c3ca3e5fdda48cb13b4",
+  "revision": "73101490af06f0087308224f763e8763a2e6a51d",
   "pages": [
     "index.html",
     "projects.html",
@@ -11,6 +11,7 @@
     "03_GD_Data_Environment_Order_List.html",
     "07_Internal_Data_Environment_Intro.html",
     "08_External_Data_Environment_Catalogue.html",
-    "First Sample Kit.html"
+    "First Sample Kit.html",
+    "10_Pilot_Samples_Intro.html"
   ]
 }
