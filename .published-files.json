@@ -1,16 +1,16 @@
 [
-  "updates.html",
-  "version.json",
-  "decisions.html",
-  "ByteInfra_Architecture.html",
+  "08_External_Data_Environment_Catalogue.html",
+  "07_Internal_Data_Environment_Intro.html",
+  "collaboration.html",
   "projects.html",
   "First Sample Kit.html",
-  "08_External_Data_Environment_Catalogue.html",
-  "collaboration.html",
-  ".nojekyll",
-  "data-env.html",
-  "07_Internal_Data_Environment_Intro.html",
+  "decisions.html",
   "03_GD_Data_Environment_Order_List.html",
+  ".nojekyll",
+  "ByteInfra_Architecture.html",
+  "aisle.html",
   "index.html",
-  "aisle.html"
+  "version.json",
+  "data-env.html",
+  "updates.html"
 ]
