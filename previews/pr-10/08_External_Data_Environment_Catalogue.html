@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GreenDynamics Data &amp; Environments Menu</title>
+<style>
+:root{--bg:#fbfaf7;--panel:#fff;--ink:#1c1c1a;--muted:#6b6a65;--line:#e4e1d9;--accent:#1f3864;--accent-ink:#fff;
+--corpus:#ececec;--comp:#dbe5f3;--phys:#dcefd6;--live:#2f7a3a;--data:#fbefc6;
+--corpus-ink:#444;--comp-ink:#1f3864;--phys-ink:#2b5a25;--live-ink:#fff;--data-ink:#6f5200;--ok:#2f7a3a;--wip:#9a6a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#343741;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--live:#7fd38a;--data:#3a3114;--corpus-ink:#d0d0d0;--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--live-ink:#0f1a10;--data-ink:#f0d777;--ok:#7fd38a;--wip:#f0b55a}}
+:root[data-theme="dark"]{--bg:#15161a;--panel:#1e2026;--ink:#ecebe6;--muted:#a09f99;--line:#343741;--accent:#8fb3ff;--accent-ink:#0f1a33;
+--corpus:#2b2c31;--comp:#1f2c44;--phys:#1e3320;--live:#7fd38a;--data:#3a3114;--corpus-ink:#d0d0d0;--comp-ink:#b7cdf5;--phys-ink:#b6dfae;--live-ink:#0f1a10;--data-ink:#f0d777;--ok:#7fd38a;--wip:#f0b55a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 16px 72px}
+header{margin-bottom:26px}h1{font-size:30px;margin:0 0 6px;letter-spacing:-.01em}.sub{color:var(--muted);font-size:14px}
+.lead{font-size:17px;margin:16px 0 0;max-width:820px}
+h2{font-size:19px;margin:40px 0 4px}h2+p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;margin:1px 2px 1px 0}
+.c-corpus{background:var(--corpus);color:var(--corpus-ink)}.c-comp{background:var(--comp);color:var(--comp-ink)}
+.c-phys{background:var(--phys);color:var(--phys-ink)}.c-live{background:var(--live);color:var(--live-ink)}.c-data{background:var(--data);color:var(--data-ink)}
+.st{font-size:12px;font-weight:700;white-space:nowrap}.st.ok{color:var(--ok)}.st.wip{color:var(--wip)}.st.req{color:var(--muted)}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:14px 0 4px}
+.tier{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}.tier b{display:block;margin-bottom:2px}
+.feature{background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:20px 22px;margin:22px 0 8px}
+.feature .code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+.feature h3{margin:2px 0 6px;font-size:21px}.feature p{margin:6px 0}
+.feature ul{margin:10px 0 0 18px;padding:0}.feature li{margin:3px 0;font-size:14px}
+.menu{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:78px 1fr auto;gap:12px;align-items:baseline;padding:11px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:none}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted)}
+.name{font-weight:650}.desc{font-size:13.5px;color:var(--muted);margin-top:1px}
+.right{text-align:right}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}.box h3{margin:0 0 8px;font-size:15px}.box ul{margin:0 0 0 18px;padding:0}.box li{font-size:14px;margin:3px 0}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+ol.steps li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px 10px 50px;position:relative;font-size:14px}
+ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:13px;top:9px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px}
+footer{margin-top:44px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:620px){h1{font-size:24px}.row{grid-template-columns:1fr;gap:4px}.right{text-align:left}}
+@media print{body{background:#fff}}
+</style>
+<style>.bi-toolbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:12px 24px;background:#e7edf4;color:#172c43;font:13px/1.6 system-ui;border-bottom:1px solid #ccd5df}.bi-toolbar a{color:#234b72}.bi-toolbar small{margin-left:auto}</style></head>
+<body><aside class="bi-toolbar"><a href="https://greendynamics.github.io/byteinfra-site/">ByteInfra</a><span>版本 953b4b4</span><a href="https://github.com/GreenDynamics/byteinfra/issues?q=is%3Aissue%20%22https%3A//greendynamics.github.io/byteinfra-site/08_External_Data_Environment_Catalogue.html%22">相关讨论</a><a href="https://github.com/GreenDynamics/byteinfra/issues/new?template=architecture.yml&amp;title=%5B%E6%9E%B6%E6%9E%84%E8%AE%A8%E8%AE%BA%5D+08_External_Data_Environment_Catalogue&amp;page=https%3A%2F%2Fgreendynamics.github.io%2Fbyteinfra-site%2F08_External_Data_Environment_Catalogue.html&amp;version=953b4b4c1a35d79a952a01be49e87a7e99ab3832">提出修改</a><a href="https://github.com/GreenDynamics/byteinfra/blob/953b4b4c1a35d79a952a01be49e87a7e99ab3832/docs/reference/data-env/08_External_Data_Environment_Catalogue.html">查看来源</a><small>讨论与修改需团队仓库权限</small></aside><div class="wrap">
+
+<header>
+  <h1>GreenDynamics — Data &amp; Environments Menu</h1>
+  <div class="sub">For frontier-lab research teams in the United States and European Union · edition November 2026</div>
+  <p class="lead">Browse data for model training and evaluation, alongside environments for chemistry, materials and iterative research. Our tiered chemistry and materials environments are packaged for OpenEnv. Every order is scoped with you before delivery.</p>
+</header>
+
+<h2 id="data">Data</h2>
+<p>Training and evaluation packs spanning trajectories, expert tasks and corpora. Corpora include annotated and licensed assets for training or building new tasks. Delivery formats, usage rights and any exclusivity are agreed per pack.</p>
+<div class="menu">
+  <div class="row"><span class="code">DAT-T</span><div><div class="name">Trajectory packs</div><div class="desc">complete records of a model running a GreenDynamics environment, successes and failures together; Live packs include raw instrument data</div></div><div class="right"><span class="chip c-data">Trajectories</span></div></div>
+  <div class="row" id="dat-t2">
+    <span class="code">DAT-T2</span>
+    <div><div class="name">Financial modelling and quantitative research</div><div class="desc">Quantitative research tasks and full agent trajectories using market data. Examples include repairing backtests, developing predictive factors and forecasting asset returns. Results are evaluated on held-out time periods using metrics such as prediction accuracy and backtested returns.</div></div>
+    <div class="right"><span class="chip c-data">Trajectories</span></div>
+  </div>
+  <div class="row"><span class="code">DAT-E1</span><div><div class="name">Expert evaluation sets</div><div class="desc">scientist-written, double-reviewed questions with a held-out set we keep</div></div><div class="right"><span class="chip c-data">Expert</span></div></div>
+  <div class="row"><span class="code">DAT-E2</span><div><div class="name">Expert rubric sets</div><div class="desc">step-level scoring rubrics for chemistry procedures, for judges and reward models</div></div><div class="right"><span class="chip c-data">Expert</span></div></div>
+  <div class="row"><span class="code">DAT-E3</span><div><div class="name">Expert theory corpus</div><div class="desc">worked problems, derivations and mechanism explanations for training</div></div><div class="right"><span class="chip c-data">Expert</span></div></div>
+  <div class="row" id="dat-e5">
+    <span class="code">DAT-E5</span>
+    <div><div class="name">Long-horizon scientific research tasks</div><div class="desc">Runnable research workspaces with papers, data, code and notes. Agents reproduce findings, test a claim or investigate a discrepancy. Automated checks assess key findings, intermediate results and final deliverables against expert reference outcomes.</div></div>
+    <div class="right"><span class="chip c-data">Expert</span></div>
+  </div>
+  <div class="row" id="dat-e6">
+    <span class="code">DAT-E6</span>
+    <div><div class="name">Professional workflow tasks</div><div class="desc">Expert-authored assignments with source files, written policies and simulated business tools. Agents produce a finished deliverable or complete a multi-step workflow. Evaluation uses expert rubrics for deliverables and automated checks of final system records.</div></div>
+    <div class="right"><span class="chip c-data">Expert</span></div>
+  </div>
+  <div class="row" id="dat-e7">
+    <span class="code">DAT-E7</span>
+    <div><div class="name">Multimodal coding tasks</div><div class="desc">Task briefs and inputs paired with runnable source code and editable outputs such as slides, documents, web interfaces and scientific charts. Automated checks assess the rendered output, structure and data binding. Experts review visual quality against the brief.</div></div>
+    <div class="right"><span class="chip c-data">Expert</span></div>
+  </div>
+  <div class="row" id="dat-e8">
+    <span class="code">DAT-E8</span>
+    <div><div class="name">Expert reasoning tasks</div><div class="desc">Research-level problems, primarily in physics. Tasks include standalone derivations and problems that use symbolic solvers, numerical methods or code. Each task includes a reference answer and a verifier or grading rubric.</div></div>
+    <div class="right"><span class="chip c-data">Expert</span></div>
+  </div>
+  <div class="row"><span class="code">DAT-C1</span><div><div class="name">Structure–text pairs</div><div class="desc">crystal structures matched to the synthesis and property text that describes them</div></div><div class="right"><span class="chip c-corpus">Corpus</span></div></div>
+  <div class="row"><span class="code">DAT-C2</span><div><div class="name">Synthesis procedures</div><div class="desc">normalised step-by-step procedures with precursors and outcomes</div></div><div class="right"><span class="chip c-corpus">Corpus</span></div></div>
+  <div class="row"><span class="code">DAT-C3</span><div><div class="name">Property records</div><div class="desc">measured properties with units, conditions and source</div></div><div class="right"><span class="chip c-corpus">Corpus</span></div></div>
+  <div class="row"><span class="code">DAT-C4</span><div><div class="name">Evidence-grounded QA</div><div class="desc">question–answer pairs tied to their supporting source passage</div></div><div class="right"><span class="chip c-corpus">Corpus</span></div></div>
+  <div class="row"><span class="code">DAT-C5</span><div><div class="name">Characterisation library</div><div class="desc">diffraction patterns and spectra paired with structures, measured and computed marked separately</div></div><div class="right"><span class="chip c-corpus">Corpus</span></div></div>
+  <div class="row" id="dat-c6">
+    <span class="code">DAT-C6</span>
+    <div><div class="name">Music performance data</div><div class="desc">Performance recordings paired with musical scores and beat- and note-level alignment annotations corrected by music researchers.</div></div>
+    <div class="right"><span class="chip c-corpus">Corpus</span></div>
+  </div>
+  <div class="row" id="dat-c7">
+    <span class="code">DAT-C7</span>
+    <div><div class="name">Architecture and interior design assets</div><div class="desc">Dimensioned residential floor plans, editable three-dimensional scenes and multi-view renders, with structured requirements for layout, budget and furniture.</div></div>
+    <div class="right"><span class="chip c-corpus">Corpus</span></div>
+  </div>
+  <div class="row" id="dat-c8">
+    <span class="code">DAT-C8</span>
+    <div><div class="name">Licensed film, television and short dramas</div><div class="desc">Feature films, television series and short dramas delivered as video files with available metadata. Permitted uses, including training and evaluation, are confirmed for each order.</div></div>
+    <div class="right"><span class="chip c-corpus">Corpus</span></div>
+  </div>
+</div>
+
+<h2>How to read the tiers</h2>
+<p>The tiers below apply to our chemistry and materials environments. Moving right, more of the real lab is in the loop.</p>
+<div class="tiers">
+  <div class="tier"><span class="chip c-comp">Computational</span><b>Simulation only</b>scored by computational chemistry tools</div>
+  <div class="tier"><span class="chip c-phys">Echo</span><b>Outcome twin</b>fitted to real measurements; fast screening</div>
+  <div class="tier"><span class="chip c-phys">Trace</span><b>Process twin</b>every step checked for safety and feasibility</div>
+  <div class="tier"><span class="chip c-phys">Pulse</span><b>Grounded twin</b>real instrument noise and drift in the loop</div>
+  <div class="tier"><span class="chip c-live">Live</span><b>Real laboratory</b>hosted sessions on our instruments</div>
+</div>
+
+<div class="feature">
+  <div class="code">PP-01 · start here</div>
+  <h3>Pilot Pack 01 — Fundamental experiments</h3>
+  <p>Can your agent run a basic lab experiment and correctly read noisy evidence from it? Three fundamental experiments, each tested two ways: <b>control</b> (reach a target within a budget) and <b>interpretation</b> (read recorded evidence and answer).</p>
+  <ul>
+    <li>Colour mixing · acid–base titration and pH · concentration by absorbance</li>
+    <li>About 150 double-reviewed interpretation items with raw evidence</li>
+    <li>Control environments at Echo and Pulse, plus a Live episode sample</li>
+    <li>Variants for noise, drift, missing data, new instruments and failure diagnosis</li>
+    <li>An independent holdout we keep for evaluation</li>
+    <li>Acceptance criteria agreed with you before delivery</li>
+  </ul>
+  <p class="st wip" style="margin-top:12px">Building now · pilot partners open</p>
+</div>
+
+<h2>Environments — Fundamentals</h2>
+<p>Short experiments with fast feedback: can the agent operate an instrument loop, respect limits and notice drift.</p>
+<div class="menu">
+  <div class="row"><span class="code">ENV-S1</span><div><div class="name">Colour mixing</div><div class="desc">reach a target colour from dyed stocks in the fewest attempts</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Pulse</span><span class="chip c-live">Live</span><br><span class="st ok">Available</span></div></div>
+  <div class="row"><span class="code">ENV-S2</span><div><div class="name">Acid–base titration and pH control</div><div class="desc">reach and hold a target pH; read equivalence points and unknowns</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Pulse</span><span class="chip c-live">Live</span><br><span class="st ok">Available</span></div></div>
+  <div class="row"><span class="code">ENV-S3</span><div><div class="name">Viscosity targeting</div><div class="desc">blend to a target viscosity at a set temperature</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Pulse</span><span class="chip c-live">Live</span><br><span class="st req">On request</span></div></div>
+</div>
+
+<h2>Environments — Characterisation</h2>
+<p>The agent reads measured evidence and draws the conclusion a scientist would.</p>
+<div class="menu">
+  <div class="row"><span class="code">ENV-V1</span><div><div class="name">Diffraction analysis</div><div class="desc">identify phases and impurities from diffraction patterns</div></div><div class="right"><span class="chip c-comp">Computational</span><span class="chip c-phys">Pulse</span><br><span class="st req">On request</span></div></div>
+  <div class="row"><span class="code">ENV-V2</span><div><div class="name">Optical spectra analysis</div><div class="desc">derive properties and defect signatures from UV-vis, PL and FTIR</div></div><div class="right"><span class="chip c-comp">Computational</span><span class="chip c-phys">Pulse</span><br><span class="st req">On request</span></div></div>
+  <div class="row"><span class="code">ENV-V3</span><div><div class="name">Microscopy grading</div><div class="desc">grade morphology and coverage from image stacks</div></div><div class="right"><span class="chip c-phys">Pulse</span><br><span class="st req">On request</span></div></div>
+</div>
+
+<h2>Environments — Synthesis</h2>
+<p>The agent plans and runs a synthesis toward a target property, then measures the result.</p>
+<div class="menu">
+  <div class="row"><span class="code">ENV-R1</span><div><div class="name">Nanocrystal synthesis</div><div class="desc">reach a target emission colour</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Trace</span><span class="chip c-phys">Pulse</span><span class="chip c-live">Live</span><br><span class="st req">On request</span></div></div>
+  <div class="row"><span class="code">ENV-R2</span><div><div class="name">Thin-film coating</div><div class="desc">reach optical and electrical targets for photovoltaic layers</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Trace</span><span class="chip c-phys">Pulse</span><span class="chip c-live">Live</span><br><span class="st req">On request</span></div></div>
+  <div class="row"><span class="code">ENV-R3</span><div><div class="name">Thermoset formulation</div><div class="desc">reach cure and hardness targets for coatings and composites</div></div><div class="right"><span class="chip c-phys">Echo</span><span class="chip c-phys">Trace</span><span class="chip c-phys">Pulse</span><br><span class="st req">On request</span></div></div>
+</div>
+
+<h2 id="rsi-environments">Environments — Recursive Self-Improvement (RSI)</h2>
+<p>The agent starts with a working baseline and iterates to improve it. Each task includes a runnable environment and a verifier.</p>
+<div class="menu">
+  <div class="row">
+    <span class="code">ENV-RSI1</span>
+    <div><div class="name">Code and algorithm improvement</div><div class="desc">Improve a baseline such as a query optimiser or a model training loop. The verifier reruns submitted code from scratch on unseen data.</div></div>
+    <div class="right"><span class="st req">On request</span></div>
+  </div>
+  <div class="row">
+    <span class="code">ENV-RSI2</span>
+    <div><div class="name">Closed-loop wet-lab research</div><div class="desc">Propose the next experiment and commit to a prediction. Lab staff run it on real instruments, then return the measurements for the next iteration. Scoring uses the measured outcomes within a fixed experiment budget.</div></div>
+    <div class="right"><span class="st req">On request</span></div>
+  </div>
+</div>
+
+<h2>Services and add-ons</h2>
+<p>Choose applicable services when scoping an environment order.</p>
+<div class="menu">
+  <div class="row"><span class="code">SVC-01</span><div><div class="name">Model evaluation run</div><div class="desc">we run your model across a task set in twins and the lab and report results; you keep the trajectories</div></div><div class="right"><span class="st ok">Available</span></div></div>
+  <div class="row"><span class="code">SVC-02</span><div><div class="name">Safety and drift suite</div><div class="desc">scenarios that score constraint adherence and detection of instrument drift</div></div><div class="right"><span class="st wip">Building</span></div></div>
+  <div class="row"><span class="code">SVC-03</span><div><div class="name">Trustworthiness suite for lab agents</div><div class="desc">adversarial instructions, honesty on failed measurements, hazard refusal, confidentiality</div></div><div class="right"><span class="st req">Coming</span></div></div>
+  <div class="row"><span class="code">SVC-04</span><div><div class="name">Commissioned task sets</div><div class="desc">tasks built to your specification, exclusive to you, with a holdout we keep</div></div><div class="right"><span class="st ok">Available</span></div></div>
+  <div class="row"><span class="code">SVC-05</span><div><div class="name">Digital twin of your lab</div><div class="desc">we build a twin from your historical data so you can screen agents before using hardware</div></div><div class="right"><span class="st req">On request</span></div></div>
+</div>
+
+<h2>Environment and data pack deliverables</h2>
+<p>We agree the deliverables for your selected environment or data pack when scoping the order.</p>
+<div class="grid">
+  <div class="box"><h3>Documentation</h3><ul>
+    <li>Environment Card for each environment: goal, interface, scoring, valid range, robustness report</li>
+    <li>Data Sheet for each data pack: contents, schema, provenance, validation</li>
+    <li>Reference results for at least three models where included in the evaluation scope</li>
+    <li>Rights and licence documentation</li></ul></div>
+  <div class="box"><h3>Delivery</h3><ul>
+    <li>OpenEnv-compatible Docker images for packaged environments; run on your own cluster, no outbound network required</li>
+    <li>Live tier as hosted sessions</li>
+    <li>Operational figures: latency, concurrency, complete-run cost</li>
+    <li>Acceptance criteria agreed in writing before delivery</li></ul></div>
+</div>
+
+<h2>How to order</h2>
+<ol class="steps">
+  <li><b>Choose a catalogue code</b> or start with Pilot Pack 01.</li>
+  <li><b>Scope call</b> to agree tasks, volume, tier, exclusivity and acceptance criteria.</li>
+  <li><b>Sample</b> of one environment or data pack for your evaluation.</li>
+  <li><b>Delivery</b> against the agreed acceptance criteria.</li>
+</ol>
+
+<footer>GreenDynamics · AI-for-Science infrastructure · GreenDynamics produces and holds its own environments and data outside mainland China and contracts through an Australian or Hong Kong entity. Pricing scoped per order.</footer>
+</div></body></html>
